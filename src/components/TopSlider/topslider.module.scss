@@ -1,0 +1,31 @@
+.topSlider {
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  background-color: var(--primary-bg);
+  .wrap {
+    position: relative;
+    width: 1200px;
+    .images {
+      img {
+        height: 100%;
+        width: 100%;
+      }
+    }
+    i {
+      position: absolute;
+      cursor: pointer;
+    }
+    i:hover svg {
+      color: #fff;
+    }
+    .right {
+      top: 0;
+      right: 0;
+    }
+    svg {
+      font-size: 4rem;
+      color: #333;
+    }
+  }
+}

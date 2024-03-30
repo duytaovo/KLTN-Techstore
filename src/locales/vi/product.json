@@ -1,0 +1,33 @@
+{
+  "smartphone": {
+    "monitor": "Màn hình",
+    "operatingSystem": "Hệ điều hành",
+    "rearCamera": "Camera chính",
+    "frontCamera": "Camera trước",
+    "chip": "Chip",
+    "sim": "Sim",
+    "battery": "Pin",
+    "charging": "Sạc nhanh",
+    "networkSupport": "Hỗ trợ mạng",
+    "design": "Thiết kế",
+    "dimension": "Kích thước",
+    "mass": "Khối lượng",
+    "launchTime": "Năm ra mắt",
+    "accessories": "Phụ kiện",
+    "ram": "RAM",
+    "storageCapacity": "Bộ nhớ trong",
+    "color": "Màu"
+  },
+  "laptop": {
+    "monitor": "Màn hình",
+    "operatingSystem": "Hệ điều hành",
+    "gateway": "Cổng kết nối",
+    "frontCamera": "Camera",
+    "chip": "Chip",
+    "special": "Tính năng ",
+    "processorName": "Processor Name",
+    "ramName": "Ram Name",
+    "romName": "Rom Name",
+    "graphicsCardName": "Graphics Card Name"
+  }
+}

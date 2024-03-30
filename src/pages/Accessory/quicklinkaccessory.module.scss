@@ -1,0 +1,20 @@
+.container__quicklink-accessory {
+  max-width: 1200px;
+  margin: auto;
+
+  .quicklink {
+    background-color: transparent;
+    // margin-top: 0;
+    div {
+      display: flex;
+
+      max-width: 100%;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+    }
+    a {
+      border-radius: 4px;
+      border: 1px solid #e0e0e0;
+    }
+  }
+}
+

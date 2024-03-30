@@ -1,0 +1,18 @@
+.quickbtnPc:hover {
+    img{
+        border: 1px solid #2f80ed;
+
+    }
+    span{
+        color:#2f80ed;
+    }
+}
+.quickbtnPc.activePc{
+        img{
+            border: 1px solid #2f80ed;
+    
+        }
+        span{
+            color:#2f80ed;
+        }
+}

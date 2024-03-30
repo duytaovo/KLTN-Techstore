@@ -1,0 +1,27 @@
+.container-quickLinkPC{
+    .quicklink {
+        background-color: #ffffff;
+    
+        div {
+            max-width: 100%;
+            grid-template-columns: repeat(9, minmax(0, 1fr));
+    
+            a {
+                border-radius: 6px ;
+                border: 1px solid #e0e0e0;
+               
+            }
+    
+            a:hover {
+                border: 1px solid #2f80ed;
+                color: #2f80ed;
+            }
+        }
+        
+
+    }
+   
+}
+
+
+

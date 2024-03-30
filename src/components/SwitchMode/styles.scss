@@ -1,0 +1,134 @@
+$white: rgb(255, 255, 255);
+$black: rgb(0, 0, 0);
+$blue: #00aada;
+
+@mixin fill($position: absolute) {
+  position: $position;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.container {
+  @include fill(fixed);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-5 {
+  padding: 0.5rem;
+}
+
+.c-white {
+  color: $white !important;
+}
+
+.bgc-blue {
+  background-color: $blue !important;
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.icon:after {
+  @include fill();
+  content: "";
+  background-color: transparent;
+  border-radius: 50%;
+  border: 1px solid $blue;
+  opacity: 0.5;
+  animation: ring-circle-anim 1.2s infinite ease-in-out;
+  transition: all 0.5s;
+  transform-origin: 50% 50%;
+}
+
+.icon:before {
+  @include fill();
+  content: "";
+  background-color: rgba($blue, 0.5);
+  border-radius: 50%;
+  border: none;
+  animation: ring-circle-fill-anim 2.3s infinite ease-in-out;
+  transition: all 0.5s;
+  transform-origin: 50% 50%;
+}
+
+.osc-rotation {
+  box-sizing: border-box;
+  animation: oscillate-rotation 1s infinite ease-in-out;
+  transform-origin: 50% 50%;
+}
+
+.icon {
+  font-family: "Material Icons";
+  line-height: 1;
+  text-rendering: optimizeLegibility;
+}
+
+@keyframes ring-circle-anim {
+  0% {
+    transform: rotate(0) scale(1.1) skew(0deg);
+    opacity: 0;
+  }
+
+  30% {
+    transform: rotate(0) scale(1.5) skew(0deg);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: rotate(0) scale(1.7) skew(0deg);
+    opacity: 0.1;
+  }
+}
+@keyframes ring-circle-fill-anim {
+  0% {
+    transform: rotate(0) scale(1) skew(0deg);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: rotate(0) scale(1.4) skew(0deg);
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: rotate(0) scale(1.1) skew(0deg);
+    opacity: 0.2;
+  }
+}
+
+@keyframes oscillate-rotation {
+  0% {
+    transform: rotate(0) scale(1) skew(0deg);
+  }
+
+  10% {
+    transform: rotate(-25deg) scale(1) skew(0deg);
+  }
+
+  20% {
+    transform: rotate(25deg) scale(1) skew(0deg);
+  }
+
+  30% {
+    transform: rotate(-25deg) scale(1) skew(0deg);
+  }
+
+  40% {
+    transform: rotate(25deg) scale(1) skew(0deg);
+  }
+
+  50% {
+    transform: rotate(0) scale(1) skew(0deg);
+  }
+
+  100% {
+    transform: rotate(0) scale(1) skew(0deg);
+  }
+}
+

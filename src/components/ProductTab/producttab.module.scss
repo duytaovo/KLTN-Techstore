@@ -1,0 +1,20 @@
+.productTab {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  .item {
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1px solid #e0e0e0;
+    font-size: 16px;
+    background-color: #ffffff;
+    color: black;
+    cursor: pointer;
+  }
+  .active {
+    background-color: #3699d3;
+    font-weight: bold;
+  }
+}

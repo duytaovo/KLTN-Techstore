@@ -1,0 +1,30 @@
+.deal__title a {
+    display: block;
+    width: 100%;
+    font-size: 42px;
+    text-transform: uppercase;
+    font-weight: 600;
+    line-height: 2;
+    text-align: center;
+    position: relative;
+}
+
+.deal__shock {
+    color: #ff0020;
+    font-weight: bold;
+}
+
+.deal__discount {
+    color: #fff;
+    font-weight: bold;
+}
+.deal__discountpercent{
+    position: absolute;
+    top: 0;
+    right: 19%;
+    font-size: 60px;
+    font-weight: bold;
+    line-height: 106px;
+    color: #ffe45f;
+    font-family: Helvetica Neue;
+}

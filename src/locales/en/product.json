@@ -1,0 +1,33 @@
+{
+  "smartphone": {
+    "monitor": "Monitor",
+    "operatingSystem": "Operating System",
+    "rearCamera": "Rear Camera",
+    "frontCamera": "Front Camera",
+    "chip": "Chip",
+    "sim": "Sim",
+    "battery": "Battery",
+    "charging": "Charging",
+    "networkSupport": "Network Support",
+    "design": "Design",
+    "dimension": "Dimension",
+    "mass": "Mass",
+    "launchTime": "Launch Time",
+    "accessories": "Accessories",
+    "ram": "RAM",
+    "storageCapacity": "Storage Capacity",
+    "color": "Color"
+  },
+  "laptop": {
+    "monitor": "Monitor",
+    "operatingSystem": "Operating System",
+    "gateway": "Gateway",
+    "frontCamera": "Front Camera",
+    "chip": "Chip",
+    "special": "Special",
+    "processorName": "Processor Name",
+    "ramName": "Ram Name",
+    "romName": "Rom Name",
+    "graphicsCardName": "Graphics Card Name"
+  }
+}

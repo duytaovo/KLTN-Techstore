@@ -1,0 +1,48 @@
+.groupcate {
+  max-width: 1200px;
+  padding: 15px 0;
+  margin: auto;
+}
+
+.groupcate__item {
+  background-image: url(https://cdn.tgdd.vn/mwgcart/mwg-site/ContentMwg/images/accessory/tgdd/desk-phone_2.png?v=3);
+  height: 124px;
+  width: 232px;
+  position: relative;
+  cursor: pointer;
+
+  .item-title {
+    position: absolute;
+    right: 13%;
+    top: 32%;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+}
+
+.groupcate__item:nth-child(2) {
+  background-image: url(https://cdn.tgdd.vn/mwgcart/mwg-site/ContentMwg/images/accessory/tgdd/desk-lap_2.png?v=3);
+}
+
+.groupcate__item:nth-child(3) {
+  background-image: url(https://cdn.tgdd.vn/mwgcart/mwg-site/ContentMwg/images/accessory/tgdd/desk-amthanh_2.png?v=3);
+}
+
+.groupcate__item:nth-child(4) {
+  background-image: url(https://cdn.tgdd.vn/mwgcart/mwg-site/ContentMwg/images/accessory/tgdd/desk-congnghe_2.png?v=3);
+}
+
+.groupcate__item:nth-child(5) {
+  background-image: url(https://cdn.tgdd.vn/mwgcart/mwg-site/ContentMwg/images/accessory/tgdd/desk-gaming_2.png?v=3);
+}
+
+.groupcate__item:hover {
+  color: #0254c1;
+}
+
+.groupcate__body {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
