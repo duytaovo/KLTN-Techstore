@@ -7,7 +7,6 @@ import { useAppSelector } from "src/hooks/useRedux";
 import useSettings from "src/hooks/useSettings";
 import PrevBtn from "../Elements/PrevBtn";
 import NextBtn from "../Elements/NextBtn";
-import ShortBanner from "../ShortBanner";
 
 const imageCollection = mainSliderImgs;
 
@@ -126,7 +125,7 @@ const MainSlider = () => {
           />
         </div> */}
       </div>
-      <ShortBanner images={bannerBottomAdvertise} numberItem={4} />
+      {/* <ShortBanner images={bannerBottomAdvertise} numberItem={4} /> */}
     </Container>
   );
 };
