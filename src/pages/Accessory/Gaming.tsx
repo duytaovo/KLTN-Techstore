@@ -6,7 +6,7 @@ import { useAppSelector } from "src/hooks/useRedux";
 
 const productTab = ["Nổi bật", "Chuột", "Bàn phím", "Tai nghe", "Webcam"];
 const Gaming = () => {
-  const { data } = useAppSelector((state) => state.products.allProducts);
+  // const { data } = useAppSelector((state) => state.products.allProducts);
 
   return (
     <>

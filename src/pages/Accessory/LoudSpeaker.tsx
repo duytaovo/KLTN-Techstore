@@ -6,7 +6,7 @@ import { useAppSelector } from "src/hooks/useRedux";
 const productTab = ["Nổi bật", "Loa Bluetooth", "JBL", "Harman Kardon", "Sony"];
 
 const LoudSpeaker = () => {
-  const { data } = useAppSelector((state) => state.products.allProducts);
+  // const { data } = useAppSelector((state) => state.products.allProducts);
 
   return (
     <>

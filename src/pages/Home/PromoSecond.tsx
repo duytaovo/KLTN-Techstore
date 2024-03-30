@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 
 import Section from "src/components/Section/Section";
 import { useAppDispatch, useAppSelector } from "src/hooks/useRedux";
-import { getSmartPhones } from "src/store/product/smartPhoneSlice";
-import ListProduct from "src/components/ListProduct/ListProduct";
 import { Pagination } from "antd";
 import Slider from "react-slick";
 import NextArrow from "src/components/Slick/NextArrow";
@@ -14,12 +12,12 @@ const PromoFirst = () => {
   const { banner } = useAppSelector((state) => state.banner.promo.firstpromo);
   const dispatch = useAppDispatch();
 
-  const { smartPhone } = useAppSelector<any>((state) => state.smartphone);
+  const { products } = useAppSelector((state) => state.products);
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
   const pageSize = 10; // Số phần tử trên mỗi trang
 
   useEffect(() => {
-    dispatch(getSmartPhones({ pageNumber: currentPage }));
+    // dispatch(getSmartPhones({ pageNumber: currentPage }));
   }, [currentPage]);
   const handlePageChange = (page: number) => {
     setCurrentPage(page - 1);
@@ -40,8 +38,8 @@ const PromoFirst = () => {
             nextArrow={<NextArrow />}
             prevArrow={<PrevArrow />}
           >
-            {smartPhone &&
-              smartPhone?.data?.data?.map((product: any) => (
+            {products &&
+              products?.data?.data?.map((product: any) => (
                 <div className="w-full" key={""}>
                   <div className="mx-4">
                     <ProductCard

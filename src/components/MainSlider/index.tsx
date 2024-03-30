@@ -1,13 +1,13 @@
 import PortfolioIndustry from "src/components/PortfolioIndustry";
 import Container from "src/layouts/container";
 import { useEffect, useRef, useState } from "react";
-import ShortBanner from "src/components/Banner/ShortBanner";
 import { bannerBottomAdvertise, mainSliderImgs } from "src/dummydata";
 import { Image } from "../Edition/Image";
 import { useAppSelector } from "src/hooks/useRedux";
 import useSettings from "src/hooks/useSettings";
 import PrevBtn from "../Elements/PrevBtn";
 import NextBtn from "../Elements/NextBtn";
+import ShortBanner from "../ShortBanner";
 
 const imageCollection = mainSliderImgs;
 

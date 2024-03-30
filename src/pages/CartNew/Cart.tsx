@@ -247,6 +247,7 @@ export default function CartNew() {
                                   className="h-20 w-20 flex-shrink-0"
                                   to={`${`/${purchase.slug}/detail`}/${generateNameId(
                                     {
+                                      slug: purchase.slug,
                                       name: purchase.name,
                                       id: purchase.id.toString(),
                                     },
@@ -261,6 +262,7 @@ export default function CartNew() {
                                   <Link
                                     to={`${`/${purchase.slug}/detail`}/${generateNameId(
                                       {
+                                        slug: purchase.slug,
                                         name: purchase.name,
                                         id: purchase.id.toString(),
                                       },

@@ -13,7 +13,6 @@ import MenuTopAccessory from "./MenuTopAccessory";
 import { Helmet } from "react-helmet-async";
 import { useAppDispatch } from "src/hooks/useRedux";
 import { useEffect } from "react";
-import { getAllProductByCategory } from "src/store/product/productsSlice";
 
 import "./bigbanneraccessory.scss";
 import "./groupcategory.module.scss";
@@ -23,7 +22,7 @@ const Accessory = () => {
   const dispatch = useAppDispatch();
   const category = "accessory";
   useEffect(() => {
-    dispatch(getAllProductByCategory(category));
+    // dispatch(getAllProductByCategory(category));
   }, [category]);
   return (
     <>

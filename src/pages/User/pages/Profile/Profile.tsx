@@ -102,14 +102,14 @@ export default function Profile() {
     setPart3Address(remainingPart);
   }, [userWithId]);
   useEffect(() => {
-    setImages(userWithId.imageUrl);
+    // setImages(userWithId.imageUrl);
 
     setValue("fullName", userWithId.fullName);
     setValue("phoneNumber", userWithId.phoneNumber);
     setValue("address", part1Address);
     setValue("imageUrl", userWithId.imageUrl);
     setValue("email", userWithId.email);
-    setValue("gender", userWithId.gender);
+    // setValue("gender", userWithId.gender);
   }, [userWithId, setValue, part1Address]);
 
   const onSubmit = handleSubmit(async (data) => {

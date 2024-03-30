@@ -14,7 +14,7 @@ const productTab = [
   "Rounter",
 ];
 const SmartHome = () => {
-  const { data } = useAppSelector((state) => state.products.allProducts);
+  // const { data } = useAppSelector((state) => state.products.allProducts);
 
   return (
     <>
