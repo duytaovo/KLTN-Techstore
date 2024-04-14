@@ -21,7 +21,6 @@ const Filter = ({ handle, data }: FilterItem) => {
       behavior: "smooth",
     });
   };
-  console.log(PRIMARY_MAIN);
   return (
     <div className="w-[1200px] h-full mt-[10px]" ref={contain}>
       <div

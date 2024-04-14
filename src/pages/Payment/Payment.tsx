@@ -23,16 +23,34 @@ import config from "src/constants/configApi";
 import { Modal } from "antd";
 import { removeItem } from "src/store/shopping-cart/cartItemsSlide";
 import { useTheme } from "@material-ui/core";
-import { InvoiceToolbar } from "src/components/invoice";
-
+import { getVoucherUser } from "src/store/voucher/voucherSlice";
+import { Select } from "antd";
 interface FormData {}
+
+interface DataVoucherUser {
+  code: number;
+  message: string;
+  data: [
+    {
+      id: number;
+      name: string;
+      code: string;
+      startDate: string;
+      endDate: string;
+      price: number;
+      discount: number;
+      gift: string;
+    },
+  ];
+}
 
 const Payment: React.FC = () => {
   const theme = useTheme();
   const PRIMARY_MAIN = theme.palette.primary.main;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [voucher, setVoucher] = useState<number>(0);
+  const [voucherOfUser, setVoucherOfUser] = useState<DataVoucherUser[]>([]);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -44,6 +62,20 @@ const Payment: React.FC = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const onChangeSelectVoucher = (value: number) => {
+    console.log(`selected ${value}`);
+    setVoucher(value);
+  };
+
+  const onSearchSelectVoucher = (value: string) => {
+    console.log("search:", value);
+  };
+
+  const filterOption = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const [idMethod, setIdMethod] = useState<number>(0);
   const [fee, setFee] = useState<number>(0);
@@ -221,6 +253,15 @@ const Payment: React.FC = () => {
       const res = await dispatch(getUser(""));
       await unwrapResult(res);
       await dispatch(getUserById(res?.payload?.data.data.id));
+      const resVoucherOfUser = await dispatch(getVoucherUser(""))
+        .unwrap()
+        .then((data: DataVoucherUser[]) => {
+          console.log(data);
+          setVoucherOfUser(data);
+        })
+        .catch((error) => {
+          toast.error(error);
+        });
     };
     _getData();
   }, []);
@@ -237,9 +278,9 @@ const Payment: React.FC = () => {
   );
   const onSubmit = handleSubmit(async (data) => {
     const deliveryPrice = fee;
-    const discount = 0;
+    const discount: number = voucher;
     setIsModalOpen(true);
-    const finalPrice = totalPurchasePrice + deliveryPrice - discount;
+    const finalPrice = totalPurchasePrice + deliveryPrice - Number(discount);
     const body = JSON.stringify({
       nameReceiver: data.nameReceiver,
       phoneReceiver: data.phoneReceiver,
@@ -247,7 +288,7 @@ const Payment: React.FC = () => {
       message: data.message,
       orderPrice: Number(totalPurchasePrice),
       deliveryPrice,
-      discount,
+      discount:Number(discount),
       finalPrice,
       userId: Number(profile.id),
       paymentMethod: Number(data.paymentMethod),
@@ -317,9 +358,6 @@ const Payment: React.FC = () => {
           className="bg-white rounded-xl px-14 py-8 shadow-sm"
           onSubmit={onSubmit}
         >
-          {/* {cartItems.map((product, index) => (
-            <ProductItem key={index} {...product} />
-          ))} */}
           <div className="flex justify-between py-4  font-bold">
             <span>Tạm tính ({valueBuy.length}) sản phẩm:</span>
             <span className="text-red-500 text-2xl">
@@ -392,7 +430,7 @@ const Payment: React.FC = () => {
                     setAddresOption(e);
                   }}
                 />
-                <div className="mt-8">
+                {/* <div className="mt-8">
                   <SelectCustom
                     disabled
                     className={"flex-1 text-black"}
@@ -403,13 +441,30 @@ const Payment: React.FC = () => {
                     onChange={onChange}
                     value={0}
                   >
-                    {/* {errors.paymentMethod?.message} */}
                   </SelectCustom>
-                </div>
+                </div> */}
+                {totalPurchasePrice > 3000000 && (
+                  <Select
+                    showSearch
+                    placeholder="Select a voucher"
+                    optionFilterProp="children"
+                    onChange={onChangeSelectVoucher}
+                    onSearch={onSearchSelectVoucher}
+                    filterOption={filterOption}
+                    options={[
+                      {
+                        value: "99000",
+                        label: "Khuyến mãi sốc !!!",
+                      },
+                    ]}
+                  />
+                )}
                 <p className="text-green-600 mt-6">
                   Phí giao hàng: {formatCurrency(fee)}₫
                 </p>
+
                 <h4>CHỌN PHƯƠNG THỨC THANH TOÁN</h4>
+
                 <div className="mt-8">
                   <SelectCustom
                     className={"flex-1 text-black"}
@@ -420,7 +475,6 @@ const Payment: React.FC = () => {
                       { id: 2, name: "Thanh toán qua VNPay" },
                     ]}
                     register={register}
-                    isBrand={true}
                   >
                     {errors.paymentMethod?.message}
                   </SelectCustom>

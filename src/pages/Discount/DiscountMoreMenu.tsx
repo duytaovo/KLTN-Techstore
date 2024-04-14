@@ -25,8 +25,6 @@ export default function DiscountMoreMenu({ onEdit, onDelete, nameInfo }: any) {
   const { t } = useLocales();
   const ref = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
-  const [textConfirmDelete, setTextConfirmDelete] = useState("");
 
   useEffect(() => {
     // const text = t("dashboard.discounts.confirm-delete", { nameInfo });
@@ -34,7 +32,6 @@ export default function DiscountMoreMenu({ onEdit, onDelete, nameInfo }: any) {
   }, [nameInfo]);
 
   const handleDelete = () => {
-    setOpenDialogConfirm(true);
   };
 
   return (

@@ -53,7 +53,7 @@ const CardVoucher = ({ item }: Props) => {
         loading={loadings}
         onClick={() => handleAddVoucher()}
       >
-        Add
+        Thêm 
       </Button>
     </Card>
   );
