@@ -44,7 +44,7 @@ function App() {
               <ErrorBoundary>{routeElements}</ErrorBoundary>
               <ToastContainer />
               <SwitchEdit />
-              <RightContact />
+              {/* <RightContact /> */}
             </HelmetProvider>
           </NotistackProvider>
         </RtlLayout>
