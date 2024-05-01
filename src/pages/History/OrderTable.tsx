@@ -142,6 +142,12 @@ const OrderTable = () => {
   );
   useEffect(() => {
     const body = {
+      shippingId: null,
+      completeDateFrom: null,
+      completeDateTo: null,
+      productName: null,
+      customerName: null,
+      customerAddress: null,
       orderStatus: TrangthaidonhangNumber ? TrangthaidonhangNumber : [],
       buyDateFrom: value[0]?.format("YYYY-MM-DD") || null,
       buyDateTo: value[1]?.format("YYYY-MM-DD") || null,

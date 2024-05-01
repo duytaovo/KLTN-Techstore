@@ -10,13 +10,19 @@ const History = () => {
   const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
   const pageSize = 10; // Số phần tử trên mỗi trang
   const { historyOrder } = useAppSelector((state) => state.historyOrders);
-  
+
   useEffect(() => {
     const body = {
-      orderStatus: [],
+      shippingId: null,
       buyDateFrom: null,
       buyDateTo: null,
+      completeDateFrom: null,
+      completeDateTo: null,
       paymentStatus: [],
+      productName: null,
+      customerName: null,
+      customerAddress: null,
+      orderStatus: [],
     };
     dispatch(
       getHistoryOrders({

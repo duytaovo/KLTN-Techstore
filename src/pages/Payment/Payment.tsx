@@ -64,12 +64,10 @@ const Payment: React.FC = () => {
   };
 
   const onChangeSelectVoucher = (value: number) => {
-    console.log(`selected ${value}`);
     setVoucher(value);
   };
 
   const onSearchSelectVoucher = (value: string) => {
-    console.log("search:", value);
   };
 
   const filterOption = (
@@ -256,7 +254,6 @@ const Payment: React.FC = () => {
       const resVoucherOfUser = await dispatch(getVoucherUser(""))
         .unwrap()
         .then((data: DataVoucherUser[]) => {
-          console.log(data);
           setVoucherOfUser(data);
         })
         .catch((error) => {
@@ -333,7 +330,6 @@ const Payment: React.FC = () => {
     }
   });
 
-  const onChange = (value: number) => setIdMethod(value);
 
   return (
     <div className=" bg-mainBackGroundColor/30 ">

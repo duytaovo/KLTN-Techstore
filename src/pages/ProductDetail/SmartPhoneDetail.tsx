@@ -23,6 +23,8 @@ import { getDetailBrand } from "src/store/brand/brandsSlice";
 import BasicTabs from "./Tabs";
 import { useTheme } from "@material-ui/core";
 import { getDetailProduct } from "src/store/product/productsSlice";
+import axios from "axios";
+import ProductCard from "src/components/ProductCard";
 
 export default function SmartPhoneDetail() {
   const theme = useTheme();
@@ -40,8 +42,6 @@ export default function SmartPhoneDetail() {
   const [currentIndexImages, setCurrentIndexImages] = useState([0, 6]);
   const [activeImage, setActiveImage] = useState("");
   const imageRef = useRef<HTMLImageElement>(null);
-  // const [productDetailPrivateArray, setproductDetailPrivateArray] =
-  //   useState<string[]>();
 
   const [price, setPrice] = useState(
     productDetail?.lstProductTypeAndPrice[0].price,
@@ -53,7 +53,7 @@ export default function SmartPhoneDetail() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedRam, setSelectedRam] = useState<string | null>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
-
+  const [productSuggestList, setProductSuggestList] = useState<any[]>([]);
   const currentImages = useMemo(
     () =>
       productDetail?.lstProductImageUrl
@@ -82,20 +82,29 @@ export default function SmartPhoneDetail() {
       setActiveImage(productDetail?.lstProductImageUrl[0]);
     }
   }, [productDetail]);
-  // useEffect(() => {
-  //   const getData = async () => {
-  //     const res = await dispatch(getDetailProduct(params.idProduct));
-  //     unwrapResult(res);
-  //     setproductDetail(res.payload.data.data);
-  //     // if (productDetail) {
-  //     //   const productDetailsArray: string[] = Object.keys();
-  //     //   setproductDetailPrivateArray(productDetailsArray);
-  //     //   // await dispatch(getCommentByProductId(productId));
-  //     //   // await dispatch(getDetailBrand(brandId));
-  //     // }
-  //   };
-  //   getData();
-  // }, [params.idProduct, pathParts[1], dispatch]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const data = await axios.get("http://127.0.0.1:8000/bert");
+      const promises = data.data.map(async (productId: number) => {
+        const response = await fetch(
+          `http://localhost:8080/api/product/${productId}`,
+        );
+        const productData = await response.json();
+        return productData;
+      });
+
+      Promise.all(promises)
+        .then((products) => {
+          setProductSuggestList(products);
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
+        });
+    };
+
+    // fetchProduct();
+  }, []);
 
   useEffect(() => {
     dispatch(getDetailProduct(params.idProduct));
@@ -103,13 +112,6 @@ export default function SmartPhoneDetail() {
 
   useEffect(() => {
     const getData = async () => {
-      // const {
-      //   ...productDetailsWithoutInfo
-      // } = productDetail;
-      // const productDetailsArray: string[] = Object.keys(
-      //   productDetailsWithoutInfo,
-      // );
-      // setproductDetailPrivateArray(productDetailsArray);
       await dispatch(getCommentByProductId(params.idProduct));
       await dispatch(getDetailBrand(1));
     };
@@ -601,20 +603,20 @@ export default function SmartPhoneDetail() {
         </div>
       </div>
 
-      {/* <div className="mt-8">
-        <div className="container">
-          <div className="uppercase text-gray-400">CÓ THỂ BẠN CŨNG THÍCH</div>
-          {productsData && (
+      <div className="mt-8">
+        <div className="ml-20">
+          <div className="text-[16px] uppercase text-gray-400">CÓ THỂ BẠN CŨNG THÍCH</div>
+          {productSuggestList && (
             <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-              {productsData.data.data.products.map((product) => (
+              {productSuggestList?.map((product) => (
                 <div className="col-span-1" key={product._id}>
-                  <Product product={product} />
+                  <ProductCard product={product} />
                 </div>
               ))}
             </div>
           )}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

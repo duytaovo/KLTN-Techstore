@@ -11,5 +11,6 @@ export const productService = {
   getDetailProduct(params: any) {
     return httpNew.get<SuccessResponse<any[]>>(`/product/${params}`);
   },
+  
 };
 
