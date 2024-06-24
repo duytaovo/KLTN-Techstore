@@ -20,7 +20,7 @@ import path from "src/constants/path";
 import { LocationForm } from "src/components/LocationForm";
 import axios from "axios";
 import config from "src/constants/configApi";
-import { Modal } from "antd";
+import { Button, Modal } from "antd";
 import { removeItem } from "src/store/shopping-cart/cartItemsSlide";
 import { useTheme } from "@material-ui/core";
 import { getVoucherUser } from "src/store/voucher/voucherSlice";
@@ -28,20 +28,27 @@ import { Select } from "antd";
 interface FormData {}
 
 interface DataVoucherUser {
-  code: number;
-  message: string;
-  data: [
-    {
-      id: number;
-      name: string;
-      code: string;
-      startDate: string;
-      endDate: string;
-      price: number;
-      discount: number;
-      gift: string;
-    },
-  ];
+  data: {
+    code: number;
+    message: string;
+    data: [
+      {
+        id: number;
+        name: string;
+        code: string;
+        startDate: string;
+        endDate: string;
+        price: number;
+        discount: number;
+        gift: string;
+      },
+    ];
+  };
+}
+
+interface VoucherType {
+  label: string;
+  value: string;
 }
 
 const Payment: React.FC = () => {
@@ -49,8 +56,13 @@ const Payment: React.FC = () => {
   const PRIMARY_MAIN = theme.palette.primary.main;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [voucher, setVoucher] = useState<number>(0);
-  const [voucherOfUser, setVoucherOfUser] = useState<DataVoucherUser[]>([]);
+  const [voucher, setVoucherPrice] = useState<number | string>(0);
+  const [voucherPercent, setVoucherPercent] = useState<number | string>(0);
+  const [voucherFormat, setVoucherFormat] = useState<string>("price");
+  const [voucherOfUser, setVoucherOfUser] = useState<VoucherType[]>([]);
+  const [voucherOfUserPercent, setVoucherOfUserPercent] = useState<
+    VoucherType[]
+  >([]);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -63,12 +75,19 @@ const Payment: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const onChangeSelectVoucher = (value: number) => {
-    setVoucher(value);
+  const onChangeSelectVoucher = (value: number[] | string[]) => {
+    const _value = value.reduce((acc, curr) => Number(acc) + Number(curr), 0);
+    console.log(_value);
+    setVoucherPrice(_value);
   };
 
-  const onSearchSelectVoucher = (value: string) => {
+  const onChangeSelectVoucherPercent = (value: number[] | string[]) => {
+    const _value = value.reduce((acc, curr) => Number(acc) + Number(curr), 0);
+    console.log(_value);
+    setVoucherPercent(_value);
   };
+
+  const onSearchSelectVoucher = (value: string) => {};
 
   const filterOption = (
     input: string,
@@ -251,10 +270,26 @@ const Payment: React.FC = () => {
       const res = await dispatch(getUser(""));
       await unwrapResult(res);
       await dispatch(getUserById(res?.payload?.data.data.id));
-      const resVoucherOfUser = await dispatch(getVoucherUser(""))
+      await dispatch(getVoucherUser(""))
         .unwrap()
-        .then((data: DataVoucherUser[]) => {
-          setVoucherOfUser(data);
+        .then(async (data: any) => {
+          console.log(data?.data?.data);
+          const _dataPrice = await data?.data?.data
+            .filter((item: any) => item?.price && item.price > 0) // Filter items with valid prices
+            .map((item: any) => ({
+              value: item.price,
+              label: item.name,
+            }));
+
+          await setVoucherOfUser(_dataPrice);
+          const _dataPercent = await data?.data?.data
+            .filter((item: any) => item?.discount && item.discount > 0) // Filter items with valid prices
+            .map((item: any) => ({
+              value: item.discount,
+              label: item.name,
+            }));
+
+          await setVoucherOfUserPercent(_dataPercent);
         })
         .catch((error) => {
           toast.error(error);
@@ -275,9 +310,12 @@ const Payment: React.FC = () => {
   );
   const onSubmit = handleSubmit(async (data) => {
     const deliveryPrice = fee;
-    const discount: number = voucher;
+    const discountPrice: number | string = voucher;
+    const discountPercent: number | string = voucherPercent;
+
+    // console.log(discount);
     setIsModalOpen(true);
-    const finalPrice = totalPurchasePrice + deliveryPrice - Number(discount);
+    const finalPrice = totalPurchasePrice + deliveryPrice - Number(discountPrice);
     const body = JSON.stringify({
       nameReceiver: data.nameReceiver,
       phoneReceiver: data.phoneReceiver,
@@ -285,7 +323,7 @@ const Payment: React.FC = () => {
       message: data.message,
       orderPrice: Number(totalPurchasePrice),
       deliveryPrice,
-      discount:Number(discount),
+      discount: Number(discountPrice),
       finalPrice,
       userId: Number(profile.id),
       paymentMethod: Number(data.paymentMethod),
@@ -329,7 +367,6 @@ const Payment: React.FC = () => {
       handleOk();
     }
   });
-
 
   return (
     <div className=" bg-mainBackGroundColor/30 ">
@@ -439,22 +476,38 @@ const Payment: React.FC = () => {
                   >
                   </SelectCustom>
                 </div> */}
-                {totalPurchasePrice > 3000000 && (
-                  <Select
-                    showSearch
-                    placeholder="Select a voucher"
-                    optionFilterProp="children"
-                    onChange={onChangeSelectVoucher}
-                    onSearch={onSearchSelectVoucher}
-                    filterOption={filterOption}
-                    options={[
-                      {
-                        value: "99000",
-                        label: "Khuyến mãi sốc !!!",
-                      },
-                    ]}
-                  />
+                {totalPurchasePrice > 3000000 && voucherOfUser.length > 0 && (
+                  <div>
+                    <Select
+                      // defaultValue={0}
+                      mode="multiple"
+                      showSearch
+                      style={{ width: "60%" }}
+                      placeholder="Chọn voucher giảm theo tiền"
+                      optionFilterProp="children"
+                      onChange={onChangeSelectVoucher}
+                      onSearch={onSearchSelectVoucher}
+                      filterOption={filterOption}
+                      options={voucherOfUser}
+                    />
+                  </div>
                 )}
+                {/* {totalPurchasePrice > 3000000 && voucherOfUserPercent.length > 0 && (
+                  <div>
+                    <Select
+                      // defaultValue={0}
+                      mode="multiple"
+                      showSearch
+                      style={{ width: "60%" }}
+                      placeholder="Chọn voucher giảm theo %"
+                      optionFilterProp="children"
+                      onChange={onChangeSelectVoucherPercent}
+                      onSearch={onSearchSelectVoucher}
+                      filterOption={filterOption}
+                      options={voucherOfUserPercent}
+                    />
+                  </div>
+                )} */}
                 <p className="text-green-600 mt-6">
                   Phí giao hàng: {formatCurrency(fee)}₫
                 </p>
@@ -533,7 +586,7 @@ const Payment: React.FC = () => {
             <div className="flex justify-between my-4">
               <strong>Tổng tiền:</strong>
               <strong className="text-red-600 text-2xl">
-                {formatCurrency(totalPurchasePrice + fee - 0)}₫
+                {formatCurrency(totalPurchasePrice + fee - Number(voucher))}₫
               </strong>
             </div>
             <button

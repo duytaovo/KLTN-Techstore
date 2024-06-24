@@ -11,7 +11,7 @@ const voucherService = {
   getVoucherDetail(code: string) {
     return httpNew.get<SuccessResponse<any>>(`/voucher/${code}`);
   },
-  getVoucherUser(code: string) {
+  getVoucherUser() {
     return httpNew.get<SuccessResponse<any>>(`/voucher/user`);
   },
 };

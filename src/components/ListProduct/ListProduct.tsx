@@ -43,11 +43,7 @@ const ListProduct = ({
             {products?.data &&
               products?.data?.map((product: any, index: number) => (
                 <div className="col-span-1" key={index}>
-                  <ProductCard
-                    product={product}
-                    category={category}
-                    docquyen
-                  />
+                  <ProductCard product={product} category={category} docquyen />
                 </div>
               ))}
           </div>

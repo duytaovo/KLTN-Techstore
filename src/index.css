@@ -93,3 +93,6 @@ input[type="number"]::-webkit-outer-spin-button {
   /* background: linear-gradient(45deg, #0016ef, #006ec3, #00b0a8, #0ce88c); */
 }
 
+.slick-track {
+  display: flex;
+}

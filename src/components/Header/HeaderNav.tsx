@@ -10,6 +10,7 @@ import {
   Tablet,
   Pc,
   Down,
+  Windows,
 } from "../Icons";
 import path from "src/constants/path";
 // import { styled } from "@mui/material/styles";
@@ -30,9 +31,9 @@ const RootStyle = styled("div")(({ theme }) => ({
 function HeaderNav() {
   const { setColor } = useSettings();
   const anchors = [
-    { name: "Điện thoại", path: path.phone, firstIcon: Phone },
-    { name: "Laptop", path: path.laptop, firstIcon: Laptop },
-    { name: "Tablet", path: path.tablet, firstIcon: Tablet },
+    { name: "Điện thoại", path: path.phone },
+    { name: "Laptop", path: path.laptop },
+    { name: "Tablet", path: path.tablet },
     {
       name: "Phụ kiện",
       path: path.accessory,
@@ -41,7 +42,8 @@ function HeaderNav() {
       tooltip: true,
       content: AccesContent,
     },
-    { name: "Smartwatch", path: path.smartwatch, firstIcon: Smartwatch },
+    { name: "Smartwatch", path: path.smartwatch },
+    { name: "Voucher", path: path.voucher },
     // { name: "Đồng hồ", path: "/watch", firstIcon: Watch },
     // {
     //   name: "PC",

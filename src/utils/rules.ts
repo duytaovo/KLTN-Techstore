@@ -85,6 +85,11 @@ export const schemaFeedback = yup.object({
   feedbackFilesUrl: yup.array(),
 });
 
+export const schemaChangeProduct = yup.object({
+  customerDescription: yup.string(),
+});
+
+
 export const schemaAddUser = yup.object({
   gender: yup.string(),
   phoneNumber: yup

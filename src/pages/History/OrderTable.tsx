@@ -164,17 +164,58 @@ const OrderTable = () => {
   const stringStatus = (text: string) => {
     switch (text) {
       case "Ordered":
-        return "Đã đặt hàng";
-      case "Delivering":
-        return "ĐANG GIAO HÀNG";
-      case "Cancelled":
-        return "Đã hủy";
+        return "Đơn hàng đã đặt";
       case "Confirmed":
-        return "Đã xác nhận";
+        return "Đơn hàng đã xác nhận";
+      case "Requesting":
+        return "Đơn hàng đang được shipper yêu cầu";
+      case "Working":
+        return "Đơn hàng đang chờ shipper lấy";
+      case "Delivering":
+        return "Đơn hàng đang trên đường giao đến bạn";
+      case "Change_Delivering":
+        return "Đơn hàng đang được chuyển cho shipper khác";
+      case "Changed_Delivering":
+        return "Đơn hàng đã chuyển cho shipper khác";
+      case "Delivering_Fail_1":
+        return "Đơn hàng vận chuyển thất bại lần 1";
+      case "Delivering_Fail_2":
+        return "Đơn hàng vận chuyển thất bại lần 2";
+      case "Delivering_Fail_3":
+        return "Đơn hàng vận chuyển thất bại lần 3";
       case "Delivered":
-        return "Đã giao hàng";
+        return "Shipper giao thành công";
+      case "RequestChange":
+        return "Yêu cầu đổi hàng";
+      case "Changing":
+        return "Đang đổi hàng";
+      case "Changed":
+        return "Đã đổi hàng";
+      case "RequestChangeAndReturn":
+        return "Yêu cầu đổi và trả hàng";
+      case "ChangingAndReturning":
+        return "Đang đổi và trả hàng";
+      case "ChangedAndReturned":
+        return "Đã đổi và trả hàng";
+      case "RequestReturn":
+        return "Yêu cầu trả hàng";
+      case "Returning":
+        return "Đơn hàng đang trả lại";
+      case "Returned":
+        return "Đơn hàng trả lại shop thành công";
+      case "Received":
+        return "Đơn hàng đã được nhận";
+      case "Success":
+        return "Đơn hàng thành công";
+      case "Failed":
+        return "Đơn hàng thất bại";
+      case "Cancelled":
+        return "Đơn hàng đã bị huỷ";
+      default:
+        return "Trạng thái không xác định";
     }
   };
+
   return (
     <div>
       <div className="text-mainColor max-w-[1200px] ml-5 mb-5 m-auto">
@@ -216,8 +257,25 @@ const OrderTable = () => {
                 return (
                   <Fragment key={index}>
                     <Table.Row className=" text-2xl dark:border-gray-700 dark:bg-gray-800 flex-[1000]">
-                      <Table.Cell className="text-blue-400">
+                      <Table.Cell className="text-blue-400 ">
                         #{order.id}
+                        {/* {order.orderStatus == 12 ? (
+                          <span className={"text-blue-500 mx-4"}>
+                            Đã yêu cầu đổi
+                          </span>
+                        ) : order.orderStatus == 18 ? (
+                          <span className={"text-blue-500 mx-4"}>
+                            Đã yêu cầu trả
+                          </span>
+                        ) : order.orderStatus == 15 ? (
+                          <span className={"text-blue-500 mx-4"}>
+                            Đã yêu cầu đổi và trả
+                          </span>
+                        ) : order.orderStatus == 21 ? (
+                          <span className={"text-blue-500 mx-4"}>
+                            Đã nhận hàng
+                          </span>
+                        ) : null} */}
                       </Table.Cell>
                       <Table.Cell className="text-blue-400  cursor-pointer hover:text-blue-700 select-none">
                         <Button
@@ -235,9 +293,12 @@ const OrderTable = () => {
                         <p className="">{order?.buyDate.substring(0, 10)}</p>
                       </Table.Cell>
                       <Table.Cell className={styleStatus}>
-                        <div className="flex flex-grow justify-between text-xl font-bold">
+                        <div className="flex flex-grow justify-between text-xl font-bold uppercase">
                           {stringStatus(order.orderStatusString)}
-                          {order.paymentStatusString === "Payment success" ? (
+                          {order.paymentStatusString === "Payment success" ||
+                          order.orderStatus === 11 ||
+                          order.orderStatus === 21 ||
+                          order.orderStatus === 22 ? (
                             <span className="text-white text-xl bg-green-500 p-2 rounded-lg">
                               ĐÃ THANH TOÁN
                             </span>

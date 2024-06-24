@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { formatNumberToSocialStyle, getIdFromNameId } from "src/utils/utils";
+import {
+  formatCurrency,
+  formatNumberToSocialStyle,
+  generateNameId,
+  getIdFromNameId,
+  rateSale,
+} from "src/utils/utils";
 import styles from "./productdetail.module.scss";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -9,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { convert } from "html-to-text";
 import { useAppDispatch, useAppSelector } from "src/hooks/useRedux";
-import { Button, Modal, Rate } from "antd";
+import { Button, Modal, Rate, Select } from "antd";
 import DOMPurify from "dompurify";
 import QuantityController from "../CartNew/QuantityController";
 import { addItem } from "src/store/shopping-cart/cartItemsSlide";
@@ -24,7 +30,30 @@ import BasicTabs from "./Tabs";
 import { useTheme } from "@material-ui/core";
 import { getDetailProduct } from "src/store/product/productsSlice";
 import axios from "axios";
-import ProductCard from "src/components/ProductCard";
+import Skeleton from "src/components/Skeleton";
+import Slider from "react-slick";
+import "./productdetail.module.scss";
+import { StarFill } from "react-bootstrap-icons";
+import { updateText } from "src/store/dataSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+const BERT = [
+  {
+    label: "Bert",
+    value: "Bert",
+  },
+  {
+    label: "Bert-faiss",
+    value: "Bert-faiss",
+  },
+  {
+    label: "Bert-faiss-ann",
+    value: "Bert-faiss-ann",
+  },
+  {
+    label: "Bert-hnsw",
+    value: "Bert-hnsw",
+  },
+];
 
 export default function SmartPhoneDetail() {
   const theme = useTheme();
@@ -33,16 +62,13 @@ export default function SmartPhoneDetail() {
   const [buyCount, setBuyCount] = useState(1);
   const { productSlug } = useParams();
   const dispatch = useAppDispatch();
-  const location = useLocation();
-  const { brand } = useAppSelector((state) => state.brand);
-  // const [productDetail, setproductDetail] = useState<ProductDetail>();
   const { productDetail } = useAppSelector((state) => state.products);
-  const pathParts = location.pathname.split("/");
   const params = getIdFromNameId(productSlug as string);
   const [currentIndexImages, setCurrentIndexImages] = useState([0, 6]);
   const [activeImage, setActiveImage] = useState("");
   const imageRef = useRef<HTMLImageElement>(null);
-
+  const data: any = useAppSelector((state) => state.data.data);
+  const { profile, userWithId } = useAppSelector((state) => state.user);
   const [price, setPrice] = useState(
     productDetail?.lstProductTypeAndPrice[0].price,
   );
@@ -54,6 +80,7 @@ export default function SmartPhoneDetail() {
   const [selectedRam, setSelectedRam] = useState<string | null>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
   const [productSuggestList, setProductSuggestList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const currentImages = useMemo(
     () =>
       productDetail?.lstProductImageUrl
@@ -82,29 +109,93 @@ export default function SmartPhoneDetail() {
       setActiveImage(productDetail?.lstProductImageUrl[0]);
     }
   }, [productDetail]);
+  let dataBertValue = data[18]?.value;
+
+  function extractTextBetweenQuotes(text: any) {
+    const regex = /"([^"]*)"/; // Biểu thức chính quy để tìm văn bản trong dấu ngoặc kép
+    const match = text?.match(regex);
+    if (match && match[1]) {
+      return match[1]; // Trả về văn bản bên trong dấu ngoặc kép
+    } else {
+      return null;
+    }
+  }
+
+  const extractedText = extractTextBetweenQuotes(dataBertValue || "Bert-faiss");
+  const [bert, setBert] = useState(extractedText);
+  useEffect(() => {
+    setBert(extractTextBetweenQuotes(dataBertValue))
+  }, [dataBertValue]);
+  const fetchProduct = async () => {
+    setIsLoading(true);
+    const url1 = "bert";
+    const url2 = "bert-faiss";
+    const url3 = "bert-faiss-ann";
+    const url4 = "bert-hnsw";
+    const dataBert = await axios.post(
+      `http://127.0.0.1:8003/${
+        data[18]?.value == '"Bert-hnsw"'
+          ? url4
+          : data[18]?.value == '"Bert-faiss"'
+          ? url2
+          : data[18]?.value == '"Bert-faiss-ann"'
+          ? url3
+          : url1
+      }`,
+      [Number(params.idProduct)],
+    );
+    const _data = await dataBert?.data?.Data;
+
+    const promises = _data.map(async (productId: number) => {
+      const response = await fetch(
+        `http://localhost:8081/api/product/${productId}`,
+      );
+      const productData = await response.json();
+      return productData?.data;
+    });
+
+    Promise.all(promises)
+      .then((products) => {
+        setProductSuggestList(products);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  const updateBert = async () => {
+    const body = {
+      key: data[18]?.name,
+      data: bert,
+    };
+    try {
+      setIsLoading(true);
+
+      const res = await dispatch(updateText(body)).then(unwrapResult);
+      if (res?.data?.code === 200) {
+        await fetchProduct();
+      }
+      toast.success("Đã lưu thay đổi", {
+        position: "top-right",
+        autoClose: 4000,
+      });
+      window.location.reload();
+    } catch (error) {
+      toast.error("Có lỗi" + "" + error, {
+        position: "top-center",
+        autoClose: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const data = await axios.get("http://127.0.0.1:8000/bert");
-      const promises = data.data.map(async (productId: number) => {
-        const response = await fetch(
-          `http://localhost:8080/api/product/${productId}`,
-        );
-        const productData = await response.json();
-        return productData;
-      });
-
-      Promise.all(promises)
-        .then((products) => {
-          setProductSuggestList(products);
-        })
-        .catch((error) => {
-          console.error("Error fetching products:", error);
-        });
-    };
-
-    // fetchProduct();
-  }, []);
+    if (dataBertValue !== undefined) {
+      fetchProduct();
+    }
+  }, [dataBertValue]);
 
   useEffect(() => {
     dispatch(getDetailProduct(params.idProduct));
@@ -116,7 +207,7 @@ export default function SmartPhoneDetail() {
       await dispatch(getDetailBrand(1));
     };
     getData();
-  }, [activeImage, productDetail]);
+  }, [productDetail]);
 
   const next = () => {
     if (currentIndexImages[1] < productDetail?.lstProductImageUrl?.length) {
@@ -212,6 +303,9 @@ export default function SmartPhoneDetail() {
     setSelectedColor(selectedColor);
     setSelectedRam(selectedRam);
     setSelectedTypeId(typeId);
+  };
+  const handleChange = (value: string) => {
+    setBert(value);
   };
   if (!productDetail) return null;
   return (
@@ -605,14 +699,175 @@ export default function SmartPhoneDetail() {
 
       <div className="mt-8">
         <div className="ml-20">
-          <div className="text-[16px] uppercase text-gray-400">CÓ THỂ BẠN CŨNG THÍCH</div>
-          {productSuggestList && (
-            <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-              {productSuggestList?.map((product) => (
-                <div className="col-span-1" key={product._id}>
-                  <ProductCard product={product} />
+          <div className="text-[16px] uppercase text-gray-400 gap-4 flex items-center">
+            <div>CÓ THỂ BẠN CŨNG THÍCH</div>
+            <div className="flex">
+              {profile?.id == 2 && (
+                <div className="flex items-center gap-2">
+                  <Select
+                    onChange={handleChange}
+                    options={BERT}
+                    // defaultValue={extractedText}
+                    value={bert}
+                  />
+
+                  <Button
+                    style={{
+                      color: `${PRIMARY_MAIN}` || "",
+                      border: `1px solid ${PRIMARY_MAIN}` || "",
+                    }}
+                    type="default"
+                    className="border-[1.5px] text-black border-blue-400 w-[100px] h-12 "
+                    onClick={updateBert}
+                  >
+                    Cập nhật
+                  </Button>
                 </div>
-              ))}
+              )}
+            </div>
+          </div>
+          {productSuggestList && (
+            <div className="w-full mt-16">
+              {isLoading === true ? (
+                <div style={{ display: "flex", gap: 20, paddingTop: 2 }}>
+                  <Skeleton
+                    styles={{ height: "35vh" }}
+                    children={undefined}
+                    className={undefined}
+                  />
+                  <Skeleton
+                    styles={{ height: "35vh" }}
+                    children={undefined}
+                    className={undefined}
+                  />
+                  <Skeleton
+                    styles={{ height: "35vh" }}
+                    children={undefined}
+                    className={undefined}
+                  />
+                  <Skeleton
+                    styles={{ height: "35vh" }}
+                    children={undefined}
+                    className={undefined}
+                  />
+                  <Skeleton
+                    styles={{ height: "35vh" }}
+                    children={undefined}
+                    className={undefined}
+                  />
+                </div>
+              ) : (
+                <div className="">
+                  <div className="">
+                    <Slider
+                      slidesToShow={5}
+                      slidesToScroll={5}
+                      // nextArrow={<NextArrow />}
+                      // prevArrow={<PrevArrow />}
+                    >
+                      {productSuggestList?.map((product: any) => (
+                        <div className="w-full" key={product.title}>
+                          <div className="mx-4">
+                            <Link
+                              to={`/${product?.slug}${"/detail"}/${generateNameId(
+                                {
+                                  name: product?.name,
+                                  slug: "",
+                                  id: product?.productId?.toString(),
+                                },
+                              )}`}
+                            >
+                              <div className={styles.card}>
+                                <div className={styles.wrap}>
+                                  <div className={styles.image}>
+                                    <img
+                                      src={product?.lstProductImageUrl[0]}
+                                      alt={product?.name}
+                                      className={styles.img}
+                                    ></img>
+                                    <img
+                                      className={styles.imgPolicy}
+                                      src="https://cdn.tgdd.vn/ValueIcons/Label_01-05.png"
+                                    ></img>
+                                  </div>
+                                  {/* {props.tag && <p className={styles.tag}>{props.tag}</p>} */}
+                                  <p
+                                    className={"text-black font-bold text-2xl"}
+                                  >
+                                    {product?.name}
+                                  </p>
+
+                                  <strong className={styles.price}>
+                                    {product?.lstProductTypeAndPrice[0]
+                                      ?.salePrice > 0 &&
+                                    product?.lstProductTypeAndPrice[0]
+                                      ?.salePrice !==
+                                      product?.lstProductTypeAndPrice[0]
+                                        ?.price ? (
+                                      <div className="mt-3  items-center">
+                                        <div className="max-w-[70%] truncate text-[#333333] flex items-center ">
+                                          <span className="text-[14px] leading-4  line-through">
+                                            đ
+                                            {formatCurrency(
+                                              product?.lstProductTypeAndPrice[0]
+                                                ?.price,
+                                            )}
+                                          </span>
+                                          <div className="ml-4 rounded-sm  py-[2px] text-lg font-semibold uppercase text-black">
+                                            {rateSale(
+                                              product?.lstProductTypeAndPrice[0]
+                                                ?.salePrice,
+                                              product?.lstProductTypeAndPrice[0]
+                                                ?.price,
+                                            )}{" "}
+                                            giảm
+                                          </div>
+                                        </div>
+                                        <div className=" truncate text-[#e83a45] font-bold">
+                                          <span className="text-2xl">
+                                            đ
+                                            {formatCurrency(
+                                              product?.lstProductTypeAndPrice[0]
+                                                ?.salePrice,
+                                            )}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="mt-3  items-center">
+                                        <div className="truncate text-[#e83a45] font-bold">
+                                          <span className="text-2xl  ">
+                                            đ
+                                            {formatCurrency(
+                                              product?.lstProductTypeAndPrice[0]
+                                                ?.price,
+                                            )}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </strong>
+                                  <p>
+                                    <span className="text-yellow-400 font-bold">
+                                      {product?.star}&ensp;
+                                      <i>
+                                        <StarFill />
+                                      </i>
+                                    </span>
+                                    <span className="text-gray-400">
+                                      &ensp;({product?.totalReview})
+                                    </span>
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </Slider>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

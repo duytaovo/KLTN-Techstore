@@ -18,7 +18,7 @@ const Voucher: FunctionComponent<VoucherProps> = () => {
   }, [dispatch]);
 
   return (
-    <div className="max-w-[1200px] m-auto">
+    <div className="max-w-[1200px] m-auto flex gap-8">
       {vouchers?.data.map((item, index) => <CardVoucher item={item} />)}
       {/* <CardVoucher item={data} /> */}
     </div>

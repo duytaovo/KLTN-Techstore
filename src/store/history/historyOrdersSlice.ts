@@ -4,8 +4,29 @@ import { payloadCreator } from "src/utils/utils";
 
 export const getHistoryOrders = createAsyncThunk(
   "historyOrders/getHistoryOrders",
-  payloadCreator(historyService.getHistoryOrder)
+  payloadCreator(historyService.getHistoryOrder),
 );
+
+export const getHistoryDetailOrder = createAsyncThunk(
+  "historyOrders/getHistoryDetailOrder",
+  payloadCreator(historyService.getHistoryDetailOrder),
+);
+
+export const changeProductOrders = createAsyncThunk(
+  "historyOrders/changeProductOrders",
+  payloadCreator(historyService.changeProductOrder),
+);
+
+export const updateReceived = createAsyncThunk(
+  "historyOrders/updateReceived",
+  payloadCreator(historyService.updateReceiveOrder),
+);
+
+export const updateCancel = createAsyncThunk(
+  "historyOrders/updateCancel",
+  payloadCreator(historyService.updateCancelOrder),
+);
+
 const datamau = {
   code: 0,
   message: "",
@@ -33,3 +54,4 @@ export const historyOrders = createSlice({
 });
 const historyReducer = historyOrders.reducer;
 export default historyReducer;
+

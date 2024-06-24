@@ -6,8 +6,18 @@ export const historyService = {
       params,
     });
   },
-  updateHistoryOrder(id: string, data: string) {
-    return http.patch(`/orders/${id}`, data);
+  changeProductOrder(data: string) {
+    return httpNew.post(`/order/return-change`, data);
+  },
+  updateReceiveOrder(data: string) {
+    return httpNew.post(`/order/receive?orderId=${data}`);
+  },
+  updateCancelOrder({ orderId, reasone }: any) {
+    return httpNew.post(`/order/cancel?orderId=${orderId}&reason=${reasone}`);
+  },
+
+  getHistoryDetailOrder({ orderId }: any) {
+    return httpNew.get(`/order/history?orderId=${orderId}`);
   },
 };
 

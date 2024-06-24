@@ -217,7 +217,7 @@ const Header = () => {
         styles.heading
       } sticky top-0 z-[100] box-border text-textWhiteMain  w-full items-center justify-between 
       
-      ${isScrolled ? `bg-gradient-to-b from-[#86A7FC] to-[#B7E5B4]` : ""}
+      ${isScrolled ? `bg-white` : ""}
       
       `}
     >

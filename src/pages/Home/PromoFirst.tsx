@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
 import Section from "src/components/Section/Section";
 import { useAppDispatch, useAppSelector } from "src/hooks/useRedux";
-import Slider from "react-slick";
-import NextArrow from "src/components/Slick/NextArrow";
-import PrevArrow from "src/components/Slick/PrevArrow";
-import ProductCard from "src/components/ProductCard/ProductCard";
 import Skeleton from "src/components/Skeleton";
-import { Image } from "src/components/Edition/Image";
 import { getProducts } from "src/store/product/productsSlice";
 import ListProduct from "src/components/ListProduct";
 
@@ -80,7 +75,6 @@ const PromoFirst = () => {
               products={products?.data}
               isSlide={false}
               category={""}
-              // handlePageChange={handlePageChange}
               currentPage={currentPage}
             />
           )}

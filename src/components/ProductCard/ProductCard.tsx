@@ -13,8 +13,8 @@ interface Props {
 const ProductCard = ({ product, category, docquyen }: Props) => {
   return (
     <Link
-      to={`${product.slug}${"/detail"}/${generateNameId({
-        name: product.name,
+      to={`/${product?.slug}${"/detail"}/${generateNameId({
+        name: product?.name,
         slug: "",
         id: product?.productId?.toString(),
       })}`}
@@ -23,8 +23,8 @@ const ProductCard = ({ product, category, docquyen }: Props) => {
         <div className={styles.wrap}>
           <div className={styles.image}>
             <img
-              src={product.lstImageUrl[0]}
-              alt={product.name}
+              src={product?.lstImageUrl[0]}
+              alt={product?.name}
               className={styles.img}
             ></img>
             {docquyen && (
@@ -36,33 +36,9 @@ const ProductCard = ({ product, category, docquyen }: Props) => {
           </div>
           {/* {props.tag && <p className={styles.tag}>{props.tag}</p>} */}
           <p className={"text-black font-bold text-2xl"}>
-            {product.name.substring(11)}
+            {product?.name}
           </p>
-          {/* {category === "smartphone" || category === "tablet" ? (
-            <div className={styles.cardCompare}>
-              <p></p>
-              {product?.lstProductTypeAndPrice.map((item, index) => (
-                <span
-                  key={index}
-                  className={checked == index ? styles.selecttype : undefined}
-                  onClick={(e) => {
-                    handleClickDisable(e);
-                    setChecked(index);
-                  }}
-                >
-                  {item?.storageCapacity}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.cardCompare}>
-              <span>{"RAM " + product?.lstProductTypeAndPrice[0]?.ram}</span>
-              <span>
-                {"SSD " + product?.lstProductTypeAndPrice[0]?.storageCapacity}
-              </span>
-            </div>
-          )} */}
-          {/* <p>{props.gift}</p> */}
+
           <strong className={styles.price}>
             {product?.lstProductTypeAndPrice[0]?.salePrice > 0 &&
             product?.lstProductTypeAndPrice[0]?.salePrice !==
@@ -99,19 +75,9 @@ const ProductCard = ({ product, category, docquyen }: Props) => {
               </div>
             )}
           </strong>
-          {category === "laptop" && (
-            <div className={styles.infoProduct}>
-              {/* {props.parameter.map((object, index) => (
-                                <p key={index}>
-                                    <span>{Object.keys(object)}</span>
-                                    <span>{Object.values(object)}</span>
-                                </p>
-                            ))} */}
-            </div>
-          )}
           <p>
             <span className="text-yellow-400 font-bold">
-              {product.star}&ensp;
+              {product?.star}&ensp;
               <i>
                 <StarFill />
               </i>
