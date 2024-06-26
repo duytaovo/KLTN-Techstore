@@ -184,7 +184,7 @@ const OrderTable = () => {
       case "Delivering_Fail_3":
         return "Đơn hàng vận chuyển thất bại lần 3";
       case "Delivered":
-        return "Shipper giao thành công";
+        return "Đã giao hàng thành công";
       case "RequestChange":
         return "Yêu cầu đổi hàng";
       case "Changing":

@@ -115,7 +115,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
     let _value = Number(quantityReturn) + 1;
     if (max - quantityChange !== undefined && _value > max - quantityChange) {
       _value = max - quantityChange;
-      toast.error("Số lượng tối đa là: " + `${max - quantityChange}`);
+      toast.error("Đã vượt số lượng mua hàng");
     }
     setQuantityReturn(_value);
   };
@@ -131,7 +131,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
     let _value = Number(quantityChange) + 1;
     if (max - quantityReturn !== undefined && _value > max - quantityReturn) {
       _value = max - quantityReturn;
-      toast.error("Số lượng tối đa là: " + `${max - quantityReturn}`);
+      toast.error("Đã vượt số lượng mua hàng");
     }
     setQuantityChange(_value);
   };
@@ -288,6 +288,14 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
       const isCheckBody2 =
         typeChangeProductChangeAndReturn[1] !== undefined &&
         mainCauseChangeAndReturnProduct[1] !== undefined;
+      if (quantityChange + quantityReturn === 1) {
+        if (isCheckBody1 && isCheckBody2) {
+          toast.error(
+            "Bạn chỉ có thể đổi hoặc trả hàng vì số lượng sản phẩm chỉ có 1",
+          );
+          return;
+        }
+      }
 
       const body1 = {
         orderProductId: idProduct,
@@ -540,16 +548,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                         </Button>
                       ))
                     )}
-                    {/* <Button
-                      className="ml-0 p-0 border-2"
-                      onClick={() => {
-                        setIdProduct(item.orderProductId);
-                        setIsModalOpenChangeProduct(true);
-                      }}
-                      type="link"
-                    >
-                      Đổi/Trả hàng
-                    </Button> */}
+
                     {order.orderStatus !== 21 && (
                       <div className="flex flex-col">
                         <Button
@@ -656,45 +655,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                     ]}
                   />
                 </Form.Item>
-                {/* <Form.Item
-                  label="Số lượng trả"
-                  name="quantity"
-                  // rules={[{ required: true }]}
-                >
-                  <QuantityController
-                    // defaultValue={0}
-                    // onIncrease={(value) =>
-                    //   handleQuantityReturn(index, value, value <= item.quantity)
-                    // }
-                    // onDecrease={(value) =>
-                    //   handleQuantityReturn(index, value, value >= 0)
-                    // }
-                    onType={handleGetQuantityReturn}
-                    value={quantityReturn}
-                    min={0}
-                    max={item?.quantity}
-                  />
-                </Form.Item>
 
-                <Form.Item
-                  label="Số lượng đổi"
-                  name="quantity"
-                  // rules={[{ required: true }]}
-                >
-                  <QuantityController
-                    // onIncrease={(value) =>
-                    //   handleQuantityChange(index, value, value <= item.quantity)
-                    // }
-                    // onDecrease={(value) =>
-                    //   handleQuantityChange(index, value, value >= 0)
-                    // }
-                    onType={handleGetQuantityChange}
-                    // defaultValue={0}
-                    value={quantityChange}
-                    min={0}
-                    max={item?.quantity}
-                  />
-                </Form.Item> */}
                 <Form.Item
                   label="Số lượng trả"
                   name="quantityReturn"
