@@ -4,6 +4,7 @@ import path from "src/constants/path";
 import KhongTimThay from "src/pages/KhongTimThay/NotFound";
 import ChangePassword from "src/pages/User/pages/ChangePassword/ChangePassword";
 import Voucher from "src/pages/Discount/Voucher";
+import OrderHistoryDetail from "src/pages/History/OrderHistoryDetail";
 
 const CodeValidator = lazy(
   () => import("src/pages/Auth/ForgotPasword/ValidatorCode"),
@@ -36,6 +37,11 @@ export const routeMain = [
   {
     path: path.home,
     Component: Home,
+  },
+
+  {
+    path: path.historyDetail,
+    Component: OrderHistoryDetail,
   },
 
   {

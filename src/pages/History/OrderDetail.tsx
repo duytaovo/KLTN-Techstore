@@ -470,6 +470,18 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
   const checkPayment = order?.paymentStatusString === "Unpaid" ? false : true;
   return (
     <div>
+      <div className="">
+        <Button
+          className="ml-0 p-0"
+          onClick={() => {
+            navigate(`/history/detail/${order.id}`);
+          }}
+          type="link"
+        >
+          Xem chi tiết lịch sử trạng thái
+        </Button>
+      </div>
+      {/* <Link to={`/history/detail/${order.id}`} className="text-2xl"></Link> */}
       <div className="py-8 border-b">
         <div className="flex justify-between">
           <h2 className="font-bold text-3xl">Chi tiết đơn hàng: #{order.id}</h2>
@@ -496,6 +508,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
         </div>
         <p className="text-2xl">Mua tại docongnghe.com</p>
       </div>
+
       {order?.orderDetails?.map((item: any, index: number) => {
         console.log(item);
         return (
@@ -516,7 +529,6 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                   Bộ nhớ trong: {item.storageCapacity}
                 </p>
                 <p className="font-medium text-xl">Số lượng: {item.quantity}</p>
-
                 {order.orderStatus != 0 && order.orderStatus == 11 ? (
                   <div className="flex items-start  flex-col">
                     {(item.feedbackId == null && order.orderStatus == 21) ||
@@ -760,10 +772,9 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
         <p>
           <CheckCircleFill className="text-blue-500" />
           <span className="font-bold"> Số tiền đã thanh toán: </span>
-          {checkPayment ||
-            order.orderStatus === 11 ||
-            order.orderStatus === 21 ||
-            (order.orderStatus === 22 && (
+          {(checkPayment && order.orderStatus === 11) ||
+            (checkPayment && order.orderStatus === 21) ||
+            (checkPayment && order.orderStatus === 22 && (
               <span className="text-red-400">
                 {numberWithCommas(order?.finalPrice)}₫
               </span>

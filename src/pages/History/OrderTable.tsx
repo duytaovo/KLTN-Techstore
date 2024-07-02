@@ -295,10 +295,12 @@ const OrderTable = () => {
                       <Table.Cell className={styleStatus}>
                         <div className="flex flex-grow justify-between text-xl font-bold uppercase">
                           {stringStatus(order.orderStatusString)}
-                          {order.paymentStatusString === "Payment success" ||
-                          order.orderStatus === 11 ||
-                          order.orderStatus === 21 ||
-                          order.orderStatus === 22 ? (
+                          {(order.paymentStatusString === "Payment success" &&
+                            order.orderStatus === 11) ||
+                          (order.paymentStatusString === "Payment success" &&
+                            order.orderStatus === 21) ||
+                          (order.paymentStatusString === "Payment success" &&
+                            order.orderStatus === 22) ? (
                             <span className="text-white text-xl bg-green-500 p-2 rounded-lg">
                               ĐÃ THANH TOÁN
                             </span>

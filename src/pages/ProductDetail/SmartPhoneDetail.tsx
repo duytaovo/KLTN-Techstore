@@ -36,11 +36,13 @@ import "./productdetail.module.scss";
 import { StarFill } from "react-bootstrap-icons";
 import { updateText } from "src/store/dataSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
+import NextArrow from "src/components/Slick/NextArrow";
+import PrevArrow from "src/components/Slick/PrevArrow";
 const BERT = [
-  {
-    label: "Bert",
-    value: "Bert",
-  },
+  // {
+  //   label: "Bert",
+  //   value: "Bert",
+  // },
   {
     label: "Bert-faiss",
     value: "Bert-faiss",
@@ -70,15 +72,16 @@ export default function SmartPhoneDetail() {
   const data: any = useAppSelector((state) => state.data.data);
   const { profile, userWithId } = useAppSelector((state) => state.user);
   const [price, setPrice] = useState(
-    productDetail?.lstProductTypeAndPrice[0].price,
+    productDetail?.lstProductTypeAndPrice[0]?.price,
   );
   const [salePrice, setSalePrice] = useState(
-    productDetail?.lstProductTypeAndPrice[0].salePrice,
+    productDetail?.lstProductTypeAndPrice[0]?.salePrice,
   );
   const [selectedRom, setSelectedRom] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedRam, setSelectedRam] = useState<string | null>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
+  console.log(selectedTypeId);
   const [productSuggestList, setProductSuggestList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const currentImages = useMemo(
@@ -124,11 +127,11 @@ export default function SmartPhoneDetail() {
   const extractedText = extractTextBetweenQuotes(dataBertValue || "Bert-faiss");
   const [bert, setBert] = useState(extractedText);
   useEffect(() => {
-    setBert(extractTextBetweenQuotes(dataBertValue))
+    setBert(extractTextBetweenQuotes(dataBertValue));
   }, [dataBertValue]);
   const fetchProduct = async () => {
     setIsLoading(true);
-    const url1 = "bert";
+    // const url1 = "bert";
     const url2 = "bert-faiss";
     const url3 = "bert-faiss-ann";
     const url4 = "bert-hnsw";
@@ -140,7 +143,7 @@ export default function SmartPhoneDetail() {
           ? url2
           : data[18]?.value == '"Bert-faiss-ann"'
           ? url3
-          : url1
+          : url3
       }`,
       [Number(params.idProduct)],
     );
@@ -202,6 +205,10 @@ export default function SmartPhoneDetail() {
   }, [params.idProduct]);
 
   useEffect(() => {
+    dispatch(getDetailProduct(params.idProduct));
+  }, []);
+
+  useEffect(() => {
     const getData = async () => {
       await dispatch(getCommentByProductId(params.idProduct));
       await dispatch(getDetailBrand(1));
@@ -230,22 +237,22 @@ export default function SmartPhoneDetail() {
   };
   const addToCart = async () => {
     const body = {
-      id: productDetail.productId,
-      product_id: productDetail.productId,
-      slug: productDetail.slug,
+      id: productDetail?.productId,
+      product_id: productDetail?.productId,
+      slug: productDetail?.slug,
       quantity: buyCount,
-      name: productDetail.name,
-      dimension: productDetail.dimension,
-      mass: productDetail.mass,
+      name: productDetail?.name,
+      dimension: productDetail?.dimension,
+      mass: productDetail?.mass,
       price,
       salePrice,
       selectedRom,
       selectedColor,
       selectedRam,
       typeId: selectedTypeId,
-      depotId: productDetail.lstProductTypeAndPrice[0].depotId,
+      depotId: productDetail?.lstProductTypeAndPrice[0].depotId,
       quantityInDB: productDetail?.lstProductTypeAndPrice[0]?.quantity,
-      image: productDetail.lstProductImageUrl[0],
+      image: productDetail?.lstProductImageUrl[0],
     };
     await dispatch(addItem(body));
 
@@ -257,22 +264,22 @@ export default function SmartPhoneDetail() {
 
   const buyNow = async () => {
     const body = {
-      id: productDetail.productId,
-      product_id: productDetail.productId,
-      slug: productDetail.slug,
+      id: productDetail?.productId,
+      product_id: productDetail?.productId,
+      slug: productDetail?.slug,
       quantity: buyCount,
-      name: productDetail.name,
-      dimension: productDetail.dimension,
-      mass: productDetail.mass,
+      name: productDetail?.name,
+      dimension: productDetail?.dimension,
+      mass: productDetail?.mass,
       price,
       salePrice,
       selectedRom,
       selectedRam,
       selectedColor,
       typeId: selectedTypeId,
-      depotId: productDetail.lstProductTypeAndPrice[0].depotId,
+      depotId: productDetail?.lstProductTypeAndPrice[0].depotId,
       quantityInDB: productDetail?.lstProductTypeAndPrice[0]?.quantity,
-      image: productDetail.lstProductImageUrl[0],
+      image: productDetail?.lstProductImageUrl[0],
     };
     const res = await dispatch(addItem(body));
     const purchase = res.payload;
@@ -526,7 +533,7 @@ export default function SmartPhoneDetail() {
                               className="flex justify-center flex-col"
                               dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(
-                                  productDetail.description,
+                                  productDetail?.description,
                                 ),
                               }}
                             />
@@ -727,7 +734,7 @@ export default function SmartPhoneDetail() {
             </div>
           </div>
           {productSuggestList && (
-            <div className="w-full mt-16">
+            <div className=" mt-16">
               {isLoading === true ? (
                 <div style={{ display: "flex", gap: 20, paddingTop: 2 }}>
                   <Skeleton
@@ -762,6 +769,7 @@ export default function SmartPhoneDetail() {
                     <Slider
                       slidesToShow={5}
                       slidesToScroll={5}
+                      autoplay={true}
                       // nextArrow={<NextArrow />}
                       // prevArrow={<PrevArrow />}
                     >

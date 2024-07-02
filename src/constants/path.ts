@@ -22,6 +22,7 @@ const path = {
   maytinhdeban: "may-tinh-de-ban/detail/:productSlug",
   phukienDetail: "phukien/detail/:productSlug",
   smartwatchDetail: "smartwatch/detail/:productSlug",
+  historyDetail: "history/detail/:id",
   ////
   user: "/user",
   profile: "/user/profile",

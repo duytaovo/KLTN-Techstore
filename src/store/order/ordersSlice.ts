@@ -7,6 +7,11 @@ export const getPurchases = createAsyncThunk(
   payloadCreator(orderService.getPurchases)
 );
 
+export const getPurchasesHistory = createAsyncThunk(
+  "orders/getPurchasesHistory",
+  payloadCreator(orderService.getPurchasesHistory)
+);
+
 export const buyPurchases = createAsyncThunk(
   "orders/buyPurchases",
   payloadCreator(orderService.buyProducts)

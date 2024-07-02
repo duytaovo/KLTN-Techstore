@@ -9,6 +9,14 @@ export const orderService = {
       params,
     });
   },
+  getPurchasesHistory(params: any) {
+    return httpNew.get<SuccessResponse<any[]>>(
+      `${URL}/history?orderId=${params}`,
+      {
+        params,
+      },
+    );
+  },
   buyProducts(body: any[]) {
     return httpNew.post<SuccessResponse<any[]>>(`${URL}/create`, body);
   },

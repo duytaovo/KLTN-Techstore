@@ -36,37 +36,19 @@ const dataDetail: ProductDetail = {
   launchTime: 0,
   accessories: "",
   productStatus: 0,
-  lstProductTypeAndPrice: [
-    {
-      typeId: 1,
-      ram: "",
-      storageCapacity: "256 GB",
-      color: "Đen",
-      price: 45000000,
-      salePrice: 44000000,
-      quantity: 1000,
-      depotId: 1,
-    },
-  ],
+  lstProductTypeAndPrice: [],
   lstProductImageUrl: [],
   star: 0,
   totalReview: 0,
-  lstProductAttribute: [
-    {
-      productAttributeId: 1,
-      name: "monitor",
-      nameVn: "Màn hình",
-      value: "b",
-    },
-  ],
+  lstProductAttribute: [],
   brandId: 1,
-  brandName: "Apple",
+  brandName: "",
   brandImages: "",
   characteristicId: 1,
-  characteristicName: "Gaming",
+  characteristicName: "",
   categoryId: 1,
-  categoryName: "Smartphone",
-  slug: "smartphone",
+  categoryName: "",
+  slug: "",
 };
 
 const data = {

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { formatCurrency, rateSale } from "src/utils/utils";
+import { formatCurrency, getIdFromNameId, rateSale } from "src/utils/utils";
 import { Button } from "antd";
 import { useTheme } from "@material-ui/core";
 import { ProductDetail } from "src/types/allProductsType.interface";
+import { useAppDispatch } from "src/hooks/useRedux";
+import { getDetailProduct } from "src/store/product/productsSlice";
+import { useParams } from "react-router-dom";
 
 type Props = {
   productData: ProductDetail;
@@ -14,17 +17,27 @@ const Tag = ({ productData, onClick }: Props) => {
   const theme = useTheme();
   const PRIMARY_MAIN = theme.palette.primary.main;
   const [price, setPrice] = useState(
-    productData.lstProductTypeAndPrice[0].price,
+    productData.lstProductTypeAndPrice[0]?.price,
   );
+  const { productSlug } = useParams();
+  const dispatch = useAppDispatch();
+  const params = getIdFromNameId(productSlug as string);
+  console.log(params);
+  useEffect(() => {
+    console.log("object");
+    dispatch(getDetailProduct(params.idProduct));
+  }, [params.idProduct]);
 
   const [salePrice, setSalePrice] = useState(
-    productData.lstProductTypeAndPrice[0].salePrice,
+    productData.lstProductTypeAndPrice[0]?.salePrice,
   );
   //console.log(productData);
   const [selectedRam, setSelectedRam] = useState<string | null>(null);
   const [selectedRom, setSelectedRom] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-
+  console.log(selectedRam);
+  console.log(selectedRom);
+  console.log(selectedColor);
   useEffect(() => {
     if (selectedRam !== null) {
       // Lấy danh sách màu sắc tương ứng với loại RAM đã chọn
@@ -61,6 +74,11 @@ const Tag = ({ productData, onClick }: Props) => {
       ),
     ];
 
+    console.log(uniqueRams);
+    if (uniqueRams != null || uniqueRams.length > 0) {
+      setSelectedRam(uniqueRams[0]);
+    }
+
     if (!selectedRam && uniqueRams.length > 0) {
       // Nếu chưa chọn RAM, chọn RAM đầu tiên làm RAM mặc định
       setSelectedRam(uniqueRams[0]);
@@ -76,7 +94,6 @@ const Tag = ({ productData, onClick }: Props) => {
       }
     }
   }, [selectedRam, productData]);
-
   useEffect(() => {
     // Lấy danh sách loại ROM unique từ dữ liệu sản phẩm
     const uniqueRoms: any = [
@@ -87,6 +104,9 @@ const Tag = ({ productData, onClick }: Props) => {
       ),
     ];
 
+    if (uniqueRoms != null || uniqueRoms.length > 0) {
+      setSelectedRom(uniqueRoms[0]);
+    }
     if (!selectedRom && uniqueRoms.length > 0) {
       // Nếu chưa chọn ROM, chọn ROM đầu tiên làm ROM mặc định
       setSelectedRom(uniqueRoms[0]);
@@ -188,7 +208,7 @@ const Tag = ({ productData, onClick }: Props) => {
         </div>
       )}
 
-      {productData.lstProductTypeAndPrice[0].ram != null && (
+      {productData.lstProductTypeAndPrice[0]?.ram != null && (
         <div className="flex flex-wrap gap-4 mb-4">
           {[
             ...new Set(
@@ -219,7 +239,7 @@ const Tag = ({ productData, onClick }: Props) => {
           })}
         </div>
       )}
-      {productData.lstProductTypeAndPrice[0].storageCapacity != null && (
+      {productData.lstProductTypeAndPrice[0]?.storageCapacity != null && (
         <div className="flex flex-wrap gap-4 mb-4">
           {[
             ...new Set(
@@ -280,7 +300,7 @@ const Tag = ({ productData, onClick }: Props) => {
             );
           })}
       </div> */}
-      {productData.lstProductTypeAndPrice[0].color != null && (
+      {productData.lstProductTypeAndPrice[0]?.color != null && (
         <div className="flex flex-wrap gap-4 ">
           {productData.lstProductTypeAndPrice
             .filter((item: any) => item.storageCapacity === selectedRom)

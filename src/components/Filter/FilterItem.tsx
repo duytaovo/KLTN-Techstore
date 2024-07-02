@@ -273,7 +273,7 @@ const FilterItem = ({ data, handle, scroll }: Props) => {
         ) : (
           <div className={styles.itemHiden} ref={itemHiden}>
             <Link
-              to={location.pathname.substring(11)}
+              to={location.pathname}
               className={styles.close}
               onClick={handleCancel}
             >
