@@ -21,23 +21,99 @@ const data = [
     detail: [
       {
         id: 1,
-        name: "Đã đặt",
+        name: "Đơn  đã được đặt",
       },
       {
         id: 2,
-        name: "Đã xác nhận",
+        name: "Đơn  đã xác nhận",
       },
       {
         id: 3,
-        name: "Đang giao hàng",
+        name: "Đơn  đang được shipper yêu cầu",
       },
       {
         id: 4,
-        name: "Đã giao hàng",
+        name: "Đơn  đang chờ shipper lấy",
       },
       {
         id: 5,
-        name: "Đã huỷ",
+        name: "Đơn  đang trên đường giao",
+      },
+      {
+        id: 6,
+        name: "Đơn đang được chuyển shipper khác",
+      },
+      {
+        id: 7,
+        name: "Đơn đã chuyển cho shipper khác",
+      },
+      {
+        id: 8,
+        name: "Đơn vận chuyển thất bại lần 1",
+      },
+      {
+        id: 9,
+        name: "Đơn vận chuyển thất bại lần 2",
+      },
+      {
+        id: 10,
+        name: "Đơn vận chuyển thất bại lần 3",
+      },
+      {
+        id: 11,
+        name: "Đơn  đã giao thành công",
+      },
+      {
+        id: 12,
+        name: "Yêu cầu đổi hàng",
+      },
+      {
+        id: 13,
+        name: "Đơn hàng đang đổi",
+      },
+      {
+        id: 14,
+        name: "Đã đổi hàng",
+      },
+      {
+        id: 15,
+        name: "Yêu cầu trả và đổi hàng",
+      },
+      {
+        id: 16,
+        name: "Đang đổi và trả hàng",
+      },
+      {
+        id: 17,
+        name: "Đã đổi và trả hàng thành công",
+      },
+      {
+        id: 18,
+        name: "Yêu cầu trả hàng",
+      },
+      {
+        id: 19,
+        name: "Đơn hàng đang trả lại",
+      },
+      {
+        id: 20,
+        name: "Đơn trả lại shop thành công",
+      },
+      {
+        id: 21,
+        name: "Đơn đã được nhận",
+      },
+      {
+        id: 22,
+        name: "Đơn thành công",
+      },
+      {
+        id: 0,
+        name: "Đơn đã bị huỷ",
+      },
+      {
+        id: -1,
+        name: "Đơn thất bại",
       },
     ],
   },
