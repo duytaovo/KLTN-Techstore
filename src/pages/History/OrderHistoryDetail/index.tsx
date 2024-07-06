@@ -3,6 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAppDispatch } from "src/hooks/useRedux";
 import { getHistoryDetailOrder } from "src/store/history/historyOrdersSlice";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import { Box, AppBar, Toolbar, Palette, Theme } from "@material-ui/core";
+import { styled } from "@mui/system";
+import { useTheme } from "@material-ui/core/styles";
 
 interface DataType {
   wfOrderId: number;
@@ -118,7 +124,24 @@ const columns: TableProps<DataType>["columns"] = [
   },
 ];
 
+interface ExtendedPalette extends Palette {
+  gradients: {
+    primary: string;
+    info: string;
+    success: string;
+    warning: string;
+    error: string;
+  };
+}
+
+interface ExtendedTheme extends Theme {
+  palette: ExtendedPalette;
+}
+
 const OrderHistoryDetail: React.FC = () => {
+  const theme = useTheme();
+  const PRIMARY_MAIN = theme.palette.primary.main;
+  const GRADIENTS_MAIN = (theme as ExtendedTheme)?.palette.gradients?.primary;
   const dispatch = useAppDispatch();
   const location = useLocation();
   const [data, setData] = useState<DataType[]>([]);
@@ -139,7 +162,31 @@ const OrderHistoryDetail: React.FC = () => {
 
   return (
     <div className="mx-20">
-      <Table columns={columns} dataSource={data} />;
+      {/* <Table columns={columns} dataSource={data} />; */}
+      <Box sx={{ width: "100%", height: "50vh" }}>
+        <Stepper
+          alternativeLabel
+          activeStep={data.length - 1}
+          // orientation="vertical"
+        >
+          {data.map((item) => (
+            <Step key={item.wfOrderId}>
+              <StepLabel className="text-[16px] text-blue-500">
+                {item.createdTime.slice(0, 10)}
+              </StepLabel>
+              <div className="flex flex-col justify-center items-center ">
+                <div
+                  style={{ fontSize: "16px", color: `${PRIMARY_MAIN}` }}
+                  className={`text-center text-[13px] text-[${PRIMARY_MAIN}]`}
+                >
+                  {item.statusNameVn}
+                </div>
+                <div className="text-center text-[13px]">{item.userName}</div>
+              </div>
+            </Step>
+          ))}
+        </Stepper>
+      </Box>
     </div>
   );
 };

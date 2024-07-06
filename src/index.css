@@ -101,6 +101,22 @@ input[type="number"]::-webkit-outer-spin-button {
   display: none !important;
 }
 
-.ant-table-cell{
+.ant-table-cell {
   font-size: 16px !important;
 }
+
+.css-1gs9t5t-MuiStepLabel-label.MuiStepLabel-alternativeLabel {
+  font-size: 13px !important;
+}
+
+.css-1lf1fal-MuiStepLabel-iconContainer,
+.css-1v7rjd1-MuiSvgIcon-root-MuiStepIcon-root,
+.css-izqe4d-MuiSvgIcon-root-MuiStepIcon-root,
+.css-1oi91k6-MuiSvgIcon-root-MuiStepIcon-root,
+.css-1mp8kh7-MuiSvgIcon-root-MuiStepIcon-root,
+.css-1ov9m39-MuiSvgIcon-root-MuiStepIcon-root,
+.css-1vwrkz5-MuiSvgIcon-root-MuiStepIcon-root,
+.css-1t4a023-MuiSvgIcon-root-MuiStepIcon-root {
+  font-size: 24px;
+}
+
