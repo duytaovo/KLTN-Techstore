@@ -284,10 +284,12 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
     async (data) => {
       const isCheckBody1 =
         typeChangeProductChangeAndReturn[0] !== undefined &&
-        mainCauseChangeAndReturnProduct[0] !== undefined;
+        mainCauseChangeAndReturnProduct[0] !== undefined &&
+        quantityChange !== 0;
       const isCheckBody2 =
         typeChangeProductChangeAndReturn[1] !== undefined &&
-        mainCauseChangeAndReturnProduct[1] !== undefined;
+        mainCauseChangeAndReturnProduct[1] !== undefined &&
+        quantityReturn !== 0;
       if (quantityChange + quantityReturn === 1) {
         if (isCheckBody1 && isCheckBody2) {
           toast.error(
@@ -296,6 +298,9 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
           return;
         }
       }
+
+      console.log(isCheckBody1);
+      console.log(isCheckBody2);
 
       const body1 = {
         orderProductId: idProduct,
@@ -322,6 +327,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
           // await navigate(path.home);
           window.location.reload();
           setIsModalOpenChangeProduct(false);
+          return;
         } else if (isCheckBody1 == true && isCheckBody2 == false) {
           const res = await dispatch(changeProductOrders([body1]));
           unwrapResult(res);
@@ -331,6 +337,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
           // await navigate(path.home);
           window.location.reload();
           setIsModalOpenChangeProduct(false);
+          return;
         } else if (isCheckBody1 == false && isCheckBody2 == true) {
           const res = await dispatch(changeProductOrders([body2]));
           unwrapResult(res);
@@ -340,8 +347,9 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
           // await navigate(path.home);
           window.location.reload();
           setIsModalOpenChangeProduct(false);
+          return;
         } else {
-          toast.error("Vui lòng nhập các trường thông tin trên");
+          toast.error("Vui lòng nhập các trường thông tin trên cho đúng !!!");
           return;
         }
       } catch (error: any) {

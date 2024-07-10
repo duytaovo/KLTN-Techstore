@@ -93,14 +93,6 @@ input[type="number"]::-webkit-outer-spin-button {
   /* background: linear-gradient(45deg, #0016ef, #006ec3, #00b0a8, #0ce88c); */
 }
 
-.slick-track {
-  display: flex;
-}
-
-.slick-arrow {
-  display: none !important;
-}
-
 .ant-table-cell {
   font-size: 16px !important;
 }
@@ -118,5 +110,23 @@ input[type="number"]::-webkit-outer-spin-button {
 .css-1vwrkz5-MuiSvgIcon-root-MuiStepIcon-root,
 .css-1t4a023-MuiSvgIcon-root-MuiStepIcon-root {
   font-size: 24px;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: white !important;
+  display: block;
+  background: rgb(176, 190, 176);
+}
+
+.swiper-button-prev:after,
+.swiper-button-next:after {
+  font-family: "Roboto" !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0;
+  font-variant: initial;
+  line-height: 1;
+  color: white !important;
 }
 

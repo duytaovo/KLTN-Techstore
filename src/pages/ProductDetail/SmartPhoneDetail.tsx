@@ -36,8 +36,18 @@ import "./productdetail.module.scss";
 import { StarFill } from "react-bootstrap-icons";
 import { updateText } from "src/store/dataSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import NextArrow from "src/components/Slick/NextArrow";
-import PrevArrow from "src/components/Slick/PrevArrow";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { Swiper, SwiperSlide } from "swiper/react";
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Navigation } from "swiper/modules";
+import { Pagination } from "swiper/modules";
+// import "swiper/swiper-bundle.min.css";
+// import "swiper/swiper.min.css";
+// import "swiper/components/navigation/navigation.min.css";
+// import "swiper/components/pagination/pagination.min.css";
 const BERT = [
   // {
   //   label: "Bert",
@@ -764,117 +774,114 @@ export default function SmartPhoneDetail() {
                   />
                 </div>
               ) : (
-                <div className="">
-                  <div className="">
-                    <Slider
-                      slidesToShow={5}
-                      slidesToScroll={5}
-                      autoplay={true}
-                      // nextArrow={<NextArrow />}
-                      // prevArrow={<PrevArrow />}
-                    >
-                      {productSuggestList?.map((product: any) => (
-                        <div className="w-full" key={product.title}>
-                          <div className="mx-4">
-                            <Link
-                              to={`/${product?.slug}${"/detail"}/${generateNameId(
-                                {
-                                  name: product?.name,
-                                  slug: "",
-                                  id: product?.productId?.toString(),
-                                },
-                              )}`}
-                            >
-                              <div className={styles.card}>
-                                <div className={styles.wrap}>
-                                  <div className={styles.image}>
-                                    <img
-                                      src={product?.lstProductImageUrl[0]}
-                                      alt={product?.name}
-                                      className={styles.img}
-                                    ></img>
-                                    <img
-                                      className={styles.imgPolicy}
-                                      src="https://cdn.tgdd.vn/ValueIcons/Label_01-05.png"
-                                    ></img>
-                                  </div>
-                                  {/* {props.tag && <p className={styles.tag}>{props.tag}</p>} */}
-                                  <p
-                                    className={"text-black font-bold text-2xl"}
-                                  >
-                                    {product?.name}
-                                  </p>
-
-                                  <strong className={styles.price}>
-                                    {product?.lstProductTypeAndPrice[0]
-                                      ?.salePrice > 0 &&
-                                    product?.lstProductTypeAndPrice[0]
-                                      ?.salePrice !==
-                                      product?.lstProductTypeAndPrice[0]
-                                        ?.price ? (
-                                      <div className="mt-3  items-center">
-                                        <div className="max-w-[70%] truncate text-[#333333] flex items-center ">
-                                          <span className="text-[14px] leading-4  line-through">
-                                            đ
-                                            {formatCurrency(
-                                              product?.lstProductTypeAndPrice[0]
-                                                ?.price,
-                                            )}
-                                          </span>
-                                          <div className="ml-4 rounded-sm  py-[2px] text-lg font-semibold uppercase text-black">
-                                            {rateSale(
-                                              product?.lstProductTypeAndPrice[0]
-                                                ?.salePrice,
-                                              product?.lstProductTypeAndPrice[0]
-                                                ?.price,
-                                            )}{" "}
-                                            giảm
-                                          </div>
-                                        </div>
-                                        <div className=" truncate text-[#e83a45] font-bold">
-                                          <span className="text-2xl">
-                                            đ
-                                            {formatCurrency(
-                                              product?.lstProductTypeAndPrice[0]
-                                                ?.salePrice,
-                                            )}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <div className="mt-3  items-center">
-                                        <div className="truncate text-[#e83a45] font-bold">
-                                          <span className="text-2xl  ">
-                                            đ
-                                            {formatCurrency(
-                                              product?.lstProductTypeAndPrice[0]
-                                                ?.price,
-                                            )}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </strong>
-                                  <p>
-                                    <span className="text-yellow-400 font-bold">
-                                      {product?.star}&ensp;
-                                      <i>
-                                        <StarFill />
-                                      </i>
-                                    </span>
-                                    <span className="text-gray-400">
-                                      &ensp;({product?.totalReview})
-                                    </span>
-                                  </p>
+                <Swiper
+                  navigation={true}
+                  modules={[Navigation, Pagination]}
+                  className="mySwiper"
+                  slidesPerView={5}
+                  spaceBetween={30}
+                  pagination={{
+                    clickable: true,
+                  }}
+                >
+                  {productSuggestList?.map((product) => (
+                    <SwiperSlide>
+                      <div className="" key={product.title}>
+                        <div className="mx-4">
+                          <Link
+                            to={`/${product?.slug}${"/detail"}/${generateNameId(
+                              {
+                                name: product?.name,
+                                slug: "",
+                                id: product?.productId?.toString(),
+                              },
+                            )}`}
+                          >
+                            <div className={styles.card}>
+                              <div className={styles.wrap}>
+                                <div className={styles.image}>
+                                  <img
+                                    src={product?.lstProductImageUrl[0]}
+                                    alt={product?.name}
+                                    className={styles.img}
+                                  ></img>
+                                  <img
+                                    className={styles.imgPolicy}
+                                    src="https://cdn.tgdd.vn/ValueIcons/Label_01-05.png"
+                                  ></img>
                                 </div>
+                                <p className={"text-black font-bold text-2xl"}>
+                                  {product?.name}
+                                </p>
+                                <strong className={styles.price}>
+                                  {product?.lstProductTypeAndPrice[0]
+                                    ?.salePrice > 0 &&
+                                  product?.lstProductTypeAndPrice[0]
+                                    ?.salePrice !==
+                                    product?.lstProductTypeAndPrice[0]
+                                      ?.price ? (
+                                    <div className="mt-3 items-center">
+                                      <div className="max-w-[70%] truncate text-[#333333] flex items-center ">
+                                        <span className="text-[14px] leading-4 line-through">
+                                          đ
+                                          {formatCurrency(
+                                            product?.lstProductTypeAndPrice[0]
+                                              ?.price,
+                                          )}
+                                        </span>
+                                        <div className="ml-4 rounded-sm py-[2px] text-lg font-semibold uppercase text-black">
+                                          {rateSale(
+                                            product?.lstProductTypeAndPrice[0]
+                                              ?.salePrice,
+                                            product?.lstProductTypeAndPrice[0]
+                                              ?.price,
+                                          )}{" "}
+                                          giảm
+                                        </div>
+                                      </div>
+                                      <div className="truncate text-[#e83a45] font-bold">
+                                        <span className="text-2xl">
+                                          đ
+                                          {formatCurrency(
+                                            product?.lstProductTypeAndPrice[0]
+                                              ?.salePrice,
+                                          )}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="mt-3 items-center">
+                                      <div className="truncate text-[#e83a45] font-bold">
+                                        <span className="text-2xl">
+                                          đ
+                                          {formatCurrency(
+                                            product?.lstProductTypeAndPrice[0]
+                                              ?.price,
+                                          )}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )}
+                                </strong>
+                                <p>
+                                  <span className="text-yellow-400 font-bold">
+                                    {product?.star}&ensp;
+                                    <i>
+                                      <StarFill />
+                                    </i>
+                                  </span>
+                                  <span className="text-gray-400">
+                                    &ensp;({product?.totalReview})
+                                  </span>
+                                </p>
                               </div>
-                            </Link>
-                          </div>
+                            </div>
+                          </Link>
                         </div>
-                      ))}
-                    </Slider>
-                  </div>
-                </div>
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               )}
             </div>
           )}

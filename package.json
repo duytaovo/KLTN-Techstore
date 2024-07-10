@@ -95,6 +95,7 @@
     "styles": "^0.2.1",
     "stylis": "^4.3.1",
     "stylis-plugin-rtl": "^2.1.1",
+    "swiper": "^11.1.4",
     "tint": "^0.2.1",
     "usehooks-ts": "^2.9.1",
     "uuid": "^9.0.0",
