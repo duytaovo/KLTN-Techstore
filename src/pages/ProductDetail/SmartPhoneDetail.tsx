@@ -169,8 +169,7 @@ export default function SmartPhoneDetail() {
       },
     );
     setProductSuggestList(response.data.data);
-    console.log(productSuggestList)
-    setIsLoading(false)
+    setIsLoading(false);
   };
 
   const updateBert = async () => {

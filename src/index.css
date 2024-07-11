@@ -116,7 +116,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .swiper-button-next {
   color: white !important;
   display: block;
-  background: rgb(176, 190, 176);
+  background: rgb(168, 206, 168);
 }
 
 .swiper-button-prev:after,
@@ -128,5 +128,11 @@ input[type="number"]::-webkit-outer-spin-button {
   font-variant: initial;
   line-height: 1;
   color: white !important;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  width: 40px !important;
+  height: 60px !important;
 }
 
