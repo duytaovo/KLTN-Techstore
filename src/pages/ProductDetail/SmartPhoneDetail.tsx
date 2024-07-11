@@ -159,22 +159,18 @@ export default function SmartPhoneDetail() {
     );
     const _data = await dataBert?.data?.Data;
 
-    const promises = _data.map(async (productId: number) => {
-      const response = await fetch(
-        `http://localhost:8081/api/product/${productId}`,
-      );
-      const productData = await response.json();
-      return productData?.data;
-    });
-
-    Promise.all(promises)
-      .then((products) => {
-        setProductSuggestList(products);
-      })
-      .catch((error) => {
-        console.error("Error fetching products:", error);
-      })
-      .finally(() => setIsLoading(false));
+    const response = await axios.post(
+      "http://localhost:8081/api/product/list",
+      _data,
+      {
+        headers: {
+          "Content-Type": "application/json", // Set the content type to JSON
+        },
+      },
+    );
+    setProductSuggestList(response.data.data);
+    console.log(productSuggestList)
+    setIsLoading(false)
   };
 
   const updateBert = async () => {
@@ -801,7 +797,7 @@ export default function SmartPhoneDetail() {
                               <div className={styles.wrap}>
                                 <div className={styles.image}>
                                   <img
-                                    src={product?.lstProductImageUrl[0]}
+                                    src={product?.lstImageUrl[0]}
                                     alt={product?.name}
                                     className={styles.img}
                                   ></img>
