@@ -76,7 +76,10 @@ const Payment: React.FC = () => {
   };
 
   const onChangeSelectVoucher = (value: number[] | string[]) => {
-    const _value = value.reduce((acc, curr) => Number(acc) + Number(curr), 0);
+    const _value = value?.reduce(
+      (acc: any, curr: any) => Number(acc) + Number(curr),
+      0,
+    );
     console.log(_value);
     setVoucherPrice(_value);
   };
@@ -315,7 +318,8 @@ const Payment: React.FC = () => {
 
     // console.log(discount);
     setIsModalOpen(true);
-    const finalPrice = totalPurchasePrice + deliveryPrice - Number(discountPrice);
+    const finalPrice =
+      totalPurchasePrice + deliveryPrice - Number(discountPrice);
     const body = JSON.stringify({
       nameReceiver: data.nameReceiver,
       phoneReceiver: data.phoneReceiver,
