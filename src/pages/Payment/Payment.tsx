@@ -84,11 +84,11 @@ const Payment: React.FC = () => {
     setVoucherPrice(_value);
   };
 
-  const onChangeSelectVoucherPercent = (value: number[] | string[]) => {
-    const _value = value.reduce((acc, curr) => Number(acc) + Number(curr), 0);
-    console.log(_value);
-    setVoucherPercent(_value);
-  };
+  // const onChangeSelectVoucherPercent = (value: number[] | string[]) => {
+  //   const _value = value.reduce((acc, curr) => Number(acc) + Number(curr), 0);
+  //   console.log(_value);
+  //   setVoucherPercent(_value);
+  // };
 
   const onSearchSelectVoucher = (value: string) => {};
 
