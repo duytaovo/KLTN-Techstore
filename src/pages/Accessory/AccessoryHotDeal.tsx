@@ -22,7 +22,7 @@ const AccessoryHotDeal = () => {
             linkImg="https://cdn.tgdd.vn/2022/04/banner/DESKTOPTagline11-1200x100-6.png"
             discount="50%"
           />
-          <ListProduct products={products} isSlide={true} category="" />
+          {/* <ListProduct products={products} isSlide={true} category="" /> */}
         </div>
       </div>
     </>

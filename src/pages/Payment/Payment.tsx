@@ -24,8 +24,11 @@ import config from "src/constants/configApi";
 import { Button, List, message, Modal } from "antd";
 import {
   checkCart,
+  getValueBuy,
   removeItem,
+  removeItemBuy,
   updateItem,
+  updateItemBuy,
 } from "src/store/shopping-cart/cartItemsSlide";
 import { useTheme } from "@material-ui/core";
 import { getVoucherUser } from "src/store/voucher/voucherSlice";
@@ -98,13 +101,53 @@ const Payment: React.FC = () => {
   const [voucherOfUserPercent, setVoucherOfUserPercent] = useState<
     VoucherType[]
   >([]);
-  console.log(voucherOfUserCheck);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
+  const handleOkBuy = async () => {
+    // console.log("object");
+    navigate(path.cartNew);
+    // purchasesInNotGood.forEach(async (product) => {
+    //   const warning = warnings.find(
+    //     (w) =>
+    //       w.productId === product.product_id &&
+    //       w.typeId === product.typeId &&
+    //       w.depotId === product.depotId,
+    //   );
+    //   if (warning && warning.stockQuantity === 0) {
+    //     console.log("1");
+    //     await dispatch(removeItemBuy(product));
+    //     await dispatch(getValueBuy());
+    //     const _valueBuy = await JSON.parse(
+    //       localStorage.getItem("cartItemsBuy") || "",
+    //     );
+    //     // await location.reload();
+    //     if (_valueBuy.length > 0) {
+    //       setIsModalOpen(false);
+    //       setIsModalVisible(false);
+    //     } else {
+    //       navigate(path.cartNew);
+    //     }
+    //   } else if (warning) {
+        
+    //     dispatch(
+    //       await updateItemBuy({ ...product, quantity: warning.stockQuantity }),
+    //     );
+    //     await dispatch(getValueBuy());
+    //     const _valueBuy = await JSON.parse(
+    //       localStorage.getItem("cartItemsBuy") || "",
+    //     );
+    //     // location.reload();
+    //     if (_valueBuy.length > 0) {
+    //       setIsModalOpen(false);
+    //       setIsModalVisible(false);
+    //     } else {
+    //       navigate(path.cartNew);
+    //     }
+    //   }
+    // });
   };
 
   const handleCancel = () => {
@@ -476,11 +519,15 @@ const Payment: React.FC = () => {
       }
     }
   });
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [purchasesInNotGood, setPurchasesInNotGood] = useState<
     ExtendedPurchase[]
   >([]);
+  console.log(purchasesInNotGood);
   const productsToCheck = valueBuy?.map((product: any) => ({
     productId: product.product_id,
     typeId: product.typeId,
@@ -499,19 +546,6 @@ const Payment: React.FC = () => {
     handleCheckCart();
   }, [warnings]);
   const handleCancelBuy = () => {
-    purchasesInNotGood.forEach((product) => {
-      const warning = warnings.find(
-        (w) =>
-          w.productId === product.product_id &&
-          w.typeId === product.typeId &&
-          w.depotId === product.depotId,
-      );
-      if (warning && warning.stockQuantity === 0) {
-        dispatch(removeItem(product)); // Gọi action để xoá sản phẩm khỏi giỏ hàng
-      } else if (warning) {
-        dispatch(updateItem({ ...product, quantity: warning.stockQuantity }));
-      }
-    });
     setIsModalVisible(false);
     message.info("Hủy mua hàng.");
   };
@@ -775,9 +809,9 @@ const Payment: React.FC = () => {
       <Modal
         title="Số lượng hàng cần mua vượt quá số lượng còn lại trong kho !! "
         open={isModalVisible}
-        onOk={handleOk}
+        onOk={handleOkBuy}
         onCancel={handleCancelBuy}
-        okText="Tiếp tục mua"
+        okText="Trở lại giỏ hàng"
         cancelText="Hủy"
         className="text-black"
       >
@@ -798,7 +832,7 @@ const Payment: React.FC = () => {
                         id: purchase?.id?.toString(),
                       })}`}
                     >
-                      <img alt={purchase.name} src={purchase.image} />
+                      {/* <img alt={purchase.name} src={purchase.image} /> */}
                     </Link>
                     <div className="flex-grow px-2  ">
                       <Link
@@ -824,20 +858,6 @@ const Payment: React.FC = () => {
             </div>
             <div className="col-span-6">
               <div className="grid grid-cols-5 items-center">
-                <div className="col-span-2">
-                  <div className="flex items-center justify-center">
-                    <span className="text-gray-300 line-through">
-                      ₫{formatCurrency(purchase.price)}
-                    </span>
-                    {purchase.salePrice > 0 &&
-                      purchase.salePrice !== purchase.price && (
-                        <span className="ml-3">
-                          ₫{formatCurrency(purchase.salePrice)}
-                        </span>
-                      )}
-                  </div>
-                </div>
-
                 <div className="col-span-2">
                   {purchase.salePrice > 0 ? (
                     <span className="text-red-600">

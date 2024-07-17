@@ -232,6 +232,7 @@ export default function CartNew() {
   const handleBuyPurchases = async () => {
     const body = checkedPurchases.map((purchase) => ({
       product_id: purchase.product_id,
+      name: purchase.name,
       quantity: purchase.quantity,
       price: purchase.price,
       salePrice: purchase.salePrice,

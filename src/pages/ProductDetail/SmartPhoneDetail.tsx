@@ -260,6 +260,27 @@ export default function SmartPhoneDetail() {
   const handleBuyCountDecrease = (value: number) => {
     setBuyCount(value);
   };
+  const handleCheckCart = async () => {
+    const _res = await dispatch(
+      checkCart([
+        {
+          productId: productDetail?.productId,
+          typeId: selectedTypeId,
+          depotId: depotId,
+          quantity: selectedQuantityId,
+        },
+      ]),
+    );
+    unwrapResult(_res);
+    if (_res?.payload?.data?.data?.productIdNotGoods?.length > 0) {
+      toast.error("Sản phẩm này đã hết hàng trong kho", {
+        // position: "top-center",
+        autoClose: 4000,
+      });
+      return true;
+    }
+    return false;
+  };
   const handleBuyCount = (value: number) => {
     setBuyCount(value);
   };
@@ -282,12 +303,16 @@ export default function SmartPhoneDetail() {
       quantityInDB: selectedQuantityId,
       image: productDetail?.lstProductImageUrl[0],
     };
-    await dispatch(addItem(body));
 
-    toast.success("Thêm sản phẩm thành công", {
-      // position: "top-center",
-      autoClose: 4000,
-    });
+    const resultCheck = await handleCheckCart();
+    if (!resultCheck) {
+      await dispatch(addItem(body));
+
+      await toast.success("Thêm sản phẩm thành công", {
+        // position: "top-center",
+        autoClose: 4000,
+      });
+    }
   };
 
   const buyNow = async () => {
@@ -309,36 +334,18 @@ export default function SmartPhoneDetail() {
       quantityInDB: selectedQuantityId,
       image: productDetail?.lstProductImageUrl[0],
     };
-    const handleCheckCart = async () => {
-      const _res = await dispatch(
-        checkCart([
-          {
-            productId: productDetail?.productId,
-            typeId: selectedTypeId,
-            depotId: depotId,
-            quantity: selectedQuantityId,
-          },
-        ]),
-      );
-      unwrapResult(_res);
-      console.log(_res?.payload?.data?.data?.productIdNotGoods);
-      if (_res?.payload?.data?.data?.productIdNotGoods?.length > 0) {
-        toast.error("Sản phẩm này đã hết hàng trong kho", {
-          // position: "top-center",
-          autoClose: 4000,
-        });
-        return;
-      }
-    };
-    handleCheckCart();
-    const res = await dispatch(addItem(body));
-    const purchase = res.payload;
-    navigate(path.cartNew, {
-      state: {
-        purchaseId: purchase.id,
-        typeId: purchase.typeId,
-      },
-    });
+
+    const resultCheck = await handleCheckCart();
+    if (!resultCheck) {
+      const res = await dispatch(addItem(body));
+      const purchase = res.payload;
+      navigate(path.cartNew, {
+        state: {
+          purchaseId: purchase.id,
+          typeId: purchase.typeId,
+        },
+      });
+    }
   };
   const [showFullDescription, setShowFullDescription] = useState(false);
   const shortDescriptionLength = 350;

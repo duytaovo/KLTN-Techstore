@@ -35,7 +35,13 @@ export const checkCart = createAsyncThunk(
   "cartItems/checkCart",
   payloadCreator(cartService.checkCart),
 );
-
+export const getValueBuy = createAsyncThunk(
+  "cartItems/getValueBuy",
+  async (_, { getState }) => {
+    const state:any = getState();
+    return state.valueBuy;
+  },
+);
 interface Cart {
   value: any[];
   valueBuy: any[];
@@ -123,6 +129,30 @@ export const cartItemsSlice = createSlice({
         ),
       );
     },
+    updateItemBuy: (state, action) => {
+      const newItem = action.payload;
+      const itemIndex = state.valueBuy.findIndex(
+        (e: any) =>
+          e.product_id === newItem.product_id &&
+          e.selectedColor === newItem.selectedColor &&
+          e.selectedRom === newItem.selectedRom &&
+          e.selectedRam === newItem.selectedRam,
+      );
+
+      if (itemIndex !== -1) {
+        // Update the quantity of the existing item
+        state.valueBuy[itemIndex].quantity = newItem.quantity;
+
+        localStorage.setItem(
+          "cartItemsBuy",
+          JSON.stringify(
+            state.valueBuy.sort((a: any, b: any) =>
+              a.id > b.id ? 1 : a.id < b.id ? -1 : 0,
+            ),
+          ),
+        );
+      }
+    },
     updateItem: (state, action) => {
       const newItem = action.payload;
       const itemIndex = state.value.findIndex(
@@ -148,7 +178,7 @@ export const cartItemsSlice = createSlice({
       }
     },
     removeItem: (state, action) => {
-      console.log(action.payload)
+      console.log(action.payload);
       const itemToRemove = action.payload;
       state.value = state.value.filter(
         (e: any) =>
@@ -166,6 +196,25 @@ export const cartItemsSlice = createSlice({
         ),
       );
     },
+    removeItemBuy: (state, action) => {
+      const itemToRemove = action.payload;
+      state.valueBuy = state.valueBuy.filter(
+        (e: any) =>
+          e.product_id !== itemToRemove.product_id ||
+          e.selectedColor !== itemToRemove.selectedColor ||
+          e.selectedRom !== itemToRemove.selectedRom,
+      );
+
+      localStorage.setItem(
+        "cartItemsBuy",
+        JSON.stringify(
+          state.valueBuy.sort((a: any, b: any) =>
+            a.id > b.id ? 1 : a.id < b.id ? -1 : 0,
+          ),
+        ),
+      );
+    },
+
     clearCart: (state, action) => {
       state.value = [];
       localStorage.removeItem("cartItems");
@@ -181,8 +230,15 @@ export const cartItemsSlice = createSlice({
   },
 });
 
-export const { addItem, removeItem, updateItem, clearCart, addItemBuy } =
-  cartItemsSlice.actions;
+export const {
+  addItem,
+  removeItem,
+  updateItem,
+  removeItemBuy,
+  updateItemBuy,
+  clearCart,
+  addItemBuy,
+} = cartItemsSlice.actions;
 
 const cartItemReducer = cartItemsSlice.reducer;
 export default cartItemReducer;
