@@ -269,8 +269,8 @@ const OrderTable = () => {
         return "Đã đổi hàng";
       case "RequestChangeAndReturn":
         return "Yêu cầu đổi và trả hàng";
-      case "ChangingAndReturning":
-        return "Đang đổi và trả hàng";
+      // case "ChangingAndReturning":
+      //   return "Đang đổi và trả hàng";
       case "ChangedAndReturned":
         return "Đã đổi và trả hàng";
       case "RequestReturn":
@@ -310,32 +310,26 @@ const OrderTable = () => {
         <caption className="text-left p-4 font-semibold text-2xl">
           Đơn hàng đã mua gần đây
         </caption>
-        {loading > 0 ? (
-          <Skeleton
-            styles={{ height: "50vh" }}
-            children={undefined}
-            className={undefined}
-          />
-        ) : (
-          <>
-            <Table.Head className="bg-mainL1">
-              <Table.HeadCell> Mã đơn hàng </Table.HeadCell>
-              <Table.HeadCell>Sản phẩm</Table.HeadCell>
-              <Table.HeadCell>Số lượng</Table.HeadCell>
-              <Table.HeadCell>Tổng tiền</Table.HeadCell>
-              <Table.HeadCell> Ngày đặt mua</Table.HeadCell>
-              <Table.HeadCell>Trạng thái</Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="ide-y overflow-hidden">
-              {historyOrder?.data?.data?.map((order: any, index: number) => {
-                const styleStatus = style(order.orderStatusString);
-                const displayDetail = index === orderDetail.index;
-                return (
-                  <Fragment key={index}>
-                    <Table.Row className=" text-2xl dark:border-gray-700 dark:bg-gray-800 flex-[1000]">
-                      <Table.Cell className="text-blue-400 ">
-                        #{order.id}
-                        {/* {order.orderStatus == 12 ? (
+        (
+        <>
+          <Table.Head className="bg-mainL1">
+            <Table.HeadCell> Mã đơn hàng </Table.HeadCell>
+            <Table.HeadCell>Sản phẩm</Table.HeadCell>
+            <Table.HeadCell>Số lượng</Table.HeadCell>
+            <Table.HeadCell>Tổng tiền</Table.HeadCell>
+            <Table.HeadCell> Ngày đặt mua</Table.HeadCell>
+            <Table.HeadCell>Trạng thái</Table.HeadCell>
+          </Table.Head>
+          <Table.Body className="ide-y overflow-hidden">
+            {historyOrder?.data?.data?.map((order: any, index: number) => {
+              const styleStatus = style(order.orderStatusString);
+              const displayDetail = index === orderDetail.index;
+              return (
+                <Fragment key={index}>
+                  <Table.Row className=" text-2xl dark:border-gray-700 dark:bg-gray-800 flex-[1000]">
+                    <Table.Cell className="text-blue-400 ">
+                      #{order.id}
+                      {/* {order.orderStatus == 12 ? (
                           <span className={"text-blue-500 mx-4"}>
                             Đã yêu cầu đổi
                           </span>
@@ -352,60 +346,56 @@ const OrderTable = () => {
                             Đã nhận hàng
                           </span>
                         ) : null} */}
-                      </Table.Cell>
-                      <Table.Cell className="text-blue-400  cursor-pointer hover:text-blue-700 select-none">
-                        <Button
-                          type="link"
-                          onClick={() => handleDetail(index, order)}
-                        >
-                          Xem chi tiết
-                        </Button>
-                      </Table.Cell>
-                      <Table.Cell>{order?.orderDetails?.length}</Table.Cell>
-                      <Table.Cell className="text-red-400">
-                        {numberWithCommas(order?.finalPrice)}₫
-                      </Table.Cell>
-                      <Table.Cell>
-                        <p className="">{order?.buyDate.substring(0, 10)}</p>
-                      </Table.Cell>
-                      <Table.Cell className={styleStatus}>
-                        <div className="flex flex-grow justify-between text-xl font-bold uppercase">
-                          {stringStatus(order.orderStatusString)}
-                          {(order.paymentStatusString === "Payment success" &&
-                            order.orderStatus === 11) ||
-                          (order.paymentStatusString === "Payment success" &&
-                            order.orderStatus === 21) ||
-                          (order.paymentStatusString === "Payment success" &&
-                            order.orderStatus === 22) ? (
-                            <span className="text-white text-xl bg-green-500 p-2 rounded-lg">
-                              ĐÃ THANH TOÁN
-                            </span>
-                          ) : (
-                            <span className="text-white text-xl bg-gray-500 p-2 rounded-lg">
-                              CHƯA THANH TOÁN
-                            </span>
-                          )}
-                        </div>
+                    </Table.Cell>
+                    <Table.Cell className="text-blue-400  cursor-pointer hover:text-blue-700 select-none">
+                      <Button
+                        type="link"
+                        onClick={() => handleDetail(index, order)}
+                      >
+                        Xem chi tiết
+                      </Button>
+                    </Table.Cell>
+                    <Table.Cell>{order?.orderDetails?.length}</Table.Cell>
+                    <Table.Cell className="text-red-400">
+                      {numberWithCommas(order?.finalPrice)}₫
+                    </Table.Cell>
+                    <Table.Cell>
+                      <p className="">{order?.buyDate.substring(0, 10)}</p>
+                    </Table.Cell>
+                    <Table.Cell className={styleStatus}>
+                      <div className="flex flex-grow justify-between text-xl font-bold uppercase">
+                        {stringStatus(order.orderStatusString)}
+                        {order.paymentStatusString === "Payment success" &&
+                        order.orderStatus >= 11 ? (
+                          <span className="text-white text-xl bg-green-500 p-2 rounded-lg">
+                            ĐÃ THANH TOÁN
+                          </span>
+                        ) : (
+                          <span className="text-white text-xl bg-gray-500 p-2 rounded-lg">
+                            CHƯA THANH TOÁN
+                          </span>
+                        )}
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                  {displayDetail && (
+                    <Table.Row>
+                      <Table.Cell className="" colSpan={7}>
+                        <OrderDetail
+                          order={order}
+                          displayDetail={displayDetail}
+                          setOrderDetail={setOrderDetail}
+                          index={index}
+                        />
                       </Table.Cell>
                     </Table.Row>
-                    {displayDetail && (
-                      <Table.Row>
-                        <Table.Cell className="" colSpan={7}>
-                          <OrderDetail
-                            order={order}
-                            displayDetail={displayDetail}
-                            setOrderDetail={setOrderDetail}
-                            index={index}
-                          />
-                        </Table.Cell>
-                      </Table.Row>
-                    )}
-                  </Fragment>
-                );
-              })}
-            </Table.Body>
-          </>
-        )}
+                  )}
+                </Fragment>
+              );
+            })}
+          </Table.Body>
+        </>
+        )
       </Table>
     </div>
   );

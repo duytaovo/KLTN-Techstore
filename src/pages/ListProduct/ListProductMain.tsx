@@ -199,7 +199,7 @@ const ListProductMain = () => {
     dispatch(getCharacteristic({ categorySlug: path }));
     // dispatch(changePercentLoading(70));
     // setTimeout(() => dispatch(changePercentLoading(100)), 1500);
-  }, []);
+  }, [path]);
 
   const handle = (boolean: boolean) => {
     setisOpen(boolean);

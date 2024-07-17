@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from "src/hooks/useRedux";
 import { Button, Modal, Rate, Select } from "antd";
 import DOMPurify from "dompurify";
 import QuantityController from "../CartNew/QuantityController";
-import { addItem } from "src/store/shopping-cart/cartItemsSlide";
+import { addItem, checkCart } from "src/store/shopping-cart/cartItemsSlide";
 import path from "src/constants/path";
 import { getCommentByProductId } from "src/store/comment/commentsSlice";
 import RatingFeedback from "./Rating";
@@ -66,7 +66,13 @@ const BERT = [
     value: "Bert-hnsw",
   },
 ];
-
+interface Warning {
+  productId: number;
+  typeId: number;
+  depotId: number;
+  cartQuantity: number;
+  stockQuantity: number;
+}
 export default function SmartPhoneDetail() {
   const theme = useTheme();
   const PRIMARY_MAIN = theme.palette.primary.main;
@@ -84,6 +90,7 @@ export default function SmartPhoneDetail() {
   const [price, setPrice] = useState(
     productDetail?.lstProductTypeAndPrice[0]?.price,
   );
+
   const [salePrice, setSalePrice] = useState(
     productDetail?.lstProductTypeAndPrice[0]?.salePrice,
   );
@@ -91,7 +98,17 @@ export default function SmartPhoneDetail() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedRam, setSelectedRam] = useState<string | null>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
-  console.log(selectedTypeId);
+  const [selectedQuantityId, setSelectedQuantityId] = useState<number | null>(
+    null,
+  );
+  const [warnings, setWarnings] = useState<Warning[]>([]);
+  useEffect(() => {
+    const handleCheckCart = async () => {};
+    handleCheckCart();
+  }, [warnings]);
+  console.log(selectedQuantityId);
+  const [depotId, setSelectedDepotId] = useState<number | null>(null);
+
   const [productSuggestList, setProductSuggestList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const currentImages = useMemo(
@@ -237,6 +254,12 @@ export default function SmartPhoneDetail() {
     setActiveImage(img);
   };
 
+  const handleBuyCountIncrease = (value: number) => {
+    setBuyCount(value);
+  };
+  const handleBuyCountDecrease = (value: number) => {
+    setBuyCount(value);
+  };
   const handleBuyCount = (value: number) => {
     setBuyCount(value);
   };
@@ -255,8 +278,8 @@ export default function SmartPhoneDetail() {
       selectedColor,
       selectedRam,
       typeId: selectedTypeId,
-      depotId: productDetail?.lstProductTypeAndPrice[0].depotId,
-      quantityInDB: productDetail?.lstProductTypeAndPrice[0]?.quantity,
+      depotId: depotId,
+      quantityInDB: selectedQuantityId,
       image: productDetail?.lstProductImageUrl[0],
     };
     await dispatch(addItem(body));
@@ -282,10 +305,32 @@ export default function SmartPhoneDetail() {
       selectedRam,
       selectedColor,
       typeId: selectedTypeId,
-      depotId: productDetail?.lstProductTypeAndPrice[0].depotId,
-      quantityInDB: productDetail?.lstProductTypeAndPrice[0]?.quantity,
+      depotId: depotId,
+      quantityInDB: selectedQuantityId,
       image: productDetail?.lstProductImageUrl[0],
     };
+    const handleCheckCart = async () => {
+      const _res = await dispatch(
+        checkCart([
+          {
+            productId: productDetail?.productId,
+            typeId: selectedTypeId,
+            depotId: depotId,
+            quantity: selectedQuantityId,
+          },
+        ]),
+      );
+      unwrapResult(_res);
+      console.log(_res?.payload?.data?.data?.productIdNotGoods);
+      if (_res?.payload?.data?.data?.productIdNotGoods?.length > 0) {
+        toast.error("Sản phẩm này đã hết hàng trong kho", {
+          // position: "top-center",
+          autoClose: 4000,
+        });
+        return;
+      }
+    };
+    handleCheckCart();
     const res = await dispatch(addItem(body));
     const purchase = res.payload;
     navigate(path.cartNew, {
@@ -308,6 +353,8 @@ export default function SmartPhoneDetail() {
     selectedColor,
     selectedRam,
     typeId,
+    selectedQuantity,
+    selectedDepot,
   }: any) => {
     setPrice(price);
     setSalePrice(salePrice);
@@ -315,10 +362,15 @@ export default function SmartPhoneDetail() {
     setSelectedColor(selectedColor);
     setSelectedRam(selectedRam);
     setSelectedTypeId(typeId);
+    setSelectedTypeId(typeId);
+    setSelectedQuantityId(selectedQuantity);
+    setSelectedDepotId(selectedDepot);
   };
   const handleChange = (value: string) => {
     setBert(value);
   };
+  console.log(selectedQuantityId);
+  console.log(depotId);
   if (!productDetail) return null;
   return (
     <div className="bg-gray-200 py-6">
@@ -433,10 +485,6 @@ export default function SmartPhoneDetail() {
                   <span className="ml-1 text-gray-500"> Đã xem</span>
                 </div>
               </div>
-              <Link to="/" className="text-blue-500">
-                Xem Điện thoại {""} cũ giá từ 24.660.000₫ Tiết kiệm đến 27%
-              </Link>
-              {/* Giá sản phẩm và lựa chọn */}
               <div className="space-x-3 mt-4 flex justify-start align-baseline">
                 <Tag productData={productDetail} onClick={getData} />
               </div>
@@ -445,46 +493,54 @@ export default function SmartPhoneDetail() {
                 initProductDetail={productDetail}
                 handleClickPay={buyNow}
               />
-              <div className="my-6 flex items-center">
-                <div className="capitalize text-gray-600">Chọn số lượng</div>
-                <QuantityController
-                  onDecrease={handleBuyCount}
-                  onIncrease={handleBuyCount}
-                  onType={handleBuyCount}
-                  value={buyCount}
-                  max={productDetail?.lstProductTypeAndPrice[0]?.quantity}
-                />
-                <div className="ml-6 text-xl text-gray-500">
-                  {productDetail?.lstProductTypeAndPrice[0]?.quantity} sản phẩm
-                  có sẵn
-                </div>
-              </div>
+              {selectedQuantityId && selectedQuantityId > 0 && (
+                <>
+                  <div className="my-6 flex items-center">
+                    <div className="capitalize text-gray-600">
+                      Chọn số lượng
+                    </div>
+                    <QuantityController
+                      onDecrease={handleBuyCountIncrease}
+                      onIncrease={handleBuyCountDecrease}
+                      onType={handleBuyCount}
+                      value={buyCount}
+                      max={selectedQuantityId}
+                    />
+                    <div className="ml-6 text-xl text-gray-500">
+                      {productDetail?.lstProductTypeAndPrice[0]?.quantity} sản
+                      phẩm có sẵn
+                    </div>
+                  </div>
 
-              <div className="mt-4 flex flex-col w-full items-center text-black/60">
-                <button
-                  style={{
-                    background: `${PRIMARY_MAIN}`,
-                  }}
-                  onClick={addToCart}
-                  className="flex h-20 items-center w-full justify-center rounded-sm border px-5 capitalize text-white shadow-sm hover:bg-orange-500"
-                >
-                  <AddShoppingCartIcon
-                    className="text-white mr-2"
-                    fontSize="large"
-                  />
-                  Thêm vào giỏ hàng
-                </button>
-                <button
-                  onClick={buyNow}
-                  className="fkex mt-4 h-20 min-w-[5rem] w-full items-center justify-center rounded-sm  px-5 capitalize text-white  shadow-sm outline-none bg-buyColor"
-                >
-                  <ShoppingCartCheckoutIcon
-                    className="text-white mr-2"
-                    fontSize="large"
-                  />
-                  Mua ngay
-                </button>
-              </div>
+                  <div className="mt-4 flex flex-col w-full items-center text-black/60">
+                    <button
+                      style={{
+                        background: `${PRIMARY_MAIN}`,
+                      }}
+                      onClick={addToCart}
+                      className="flex h-20 items-center w-full justify-center rounded-sm border px-5 capitalize text-white shadow-sm hover:bg-orange-500"
+                    >
+                      <AddShoppingCartIcon
+                        className="text-white mr-2"
+                        fontSize="large"
+                      />
+                      Thêm vào giỏ hàng
+                    </button>
+                    <button
+                      onClick={buyNow}
+                      className="fkex mt-4 h-20 min-w-[5rem] w-full items-center justify-center rounded-sm  px-5 capitalize text-white  shadow-sm outline-none bg-buyColor"
+                    >
+                      <ShoppingCartCheckoutIcon
+                        className="text-white mr-2"
+                        fontSize="large"
+                      />
+                      Mua ngay
+                    </button>
+                  </div>
+                </>
+              )}
+              {/* Giá sản phẩm và lựa chọn */}
+
               {/* <Policy /> */}
             </div>
           </div>

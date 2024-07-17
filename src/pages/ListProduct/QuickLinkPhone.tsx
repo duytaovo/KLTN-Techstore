@@ -42,7 +42,7 @@ const QuickLinkPhone = ({
             })}
           </div>
         </div>
-        <div className="container__quicklink-demand">
+        {/* <div className="container__quicklink-demand">
           <div className="">
             <div className=" space-y-4">
               <h4 className="text-[14px] ">Chọn điện thoại theo nhu cầu:</h4>
@@ -67,7 +67,7 @@ const QuickLinkPhone = ({
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );

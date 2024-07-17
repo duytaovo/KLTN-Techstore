@@ -23,29 +23,26 @@ const Tag = ({ productData, onClick }: Props) => {
   const dispatch = useAppDispatch();
   const params = getIdFromNameId(productSlug as string);
   console.log(params);
+
   useEffect(() => {
-    console.log("object");
     dispatch(getDetailProduct(params.idProduct));
   }, [params.idProduct]);
 
   const [salePrice, setSalePrice] = useState(
     productData.lstProductTypeAndPrice[0]?.salePrice,
   );
-  //console.log(productData);
   const [selectedRam, setSelectedRam] = useState<string | null>(null);
   const [selectedRom, setSelectedRom] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  console.log(selectedRam);
-  console.log(selectedRom);
-  console.log(selectedColor);
+  const [selectedQuantity, setSelectedQuantity] = useState<number | null>(null);
+  const [selectedDepot, setSelectedDepot] = useState<number | null>(null);
+  console.log(selectedQuantity);
   useEffect(() => {
     if (selectedRam !== null) {
-      // Lấy danh sách màu sắc tương ứng với loại RAM đã chọn
       const colorsForSelectedRam = productData.lstProductTypeAndPrice
         .filter((item: any) => item.ram === selectedRam)
         .map((item: any) => item.color);
 
-      // Nếu danh sách không rỗng, chọn màu đầu tiên làm màu mặc định
       if (colorsForSelectedRam && colorsForSelectedRam.length > 0) {
         setSelectedColor(colorsForSelectedRam[0]);
       }
@@ -54,12 +51,10 @@ const Tag = ({ productData, onClick }: Props) => {
 
   useEffect(() => {
     if (selectedRom !== null) {
-      // Lấy danh sách màu sắc tương ứng với loại RAM đã chọn
       const colorsForSelectedRom = productData.lstProductTypeAndPrice
         .filter((item: any) => item.storageCapacity === selectedRom)
         .map((item: any) => item.color);
 
-      // Nếu danh sách không rỗng, chọn màu đầu tiên làm màu mặc định
       if (colorsForSelectedRom && colorsForSelectedRom.length > 0) {
         setSelectedColor(colorsForSelectedRom[0]);
       }
@@ -67,35 +62,30 @@ const Tag = ({ productData, onClick }: Props) => {
   }, [selectedRom, productData]);
 
   useEffect(() => {
-    // Lấy danh sách loại RAM unique từ dữ liệu sản phẩm
     const uniqueRams: any = [
       ...new Set(
         productData.lstProductTypeAndPrice.map((item: any) => item.ram),
       ),
     ];
 
-    console.log(uniqueRams);
     if (uniqueRams != null || uniqueRams.length > 0) {
       setSelectedRam(uniqueRams[0]);
     }
 
     if (!selectedRam && uniqueRams.length > 0) {
-      // Nếu chưa chọn RAM, chọn RAM đầu tiên làm RAM mặc định
       setSelectedRam(uniqueRams[0]);
 
-      // Lấy danh sách màu sắc tương ứng với RAM đầu tiên
       const colorsForDefaultRam = productData.lstProductTypeAndPrice
         .filter((item: any) => item.ram === uniqueRams[0])
         .map((item: any) => item.color);
 
       if (colorsForDefaultRam && colorsForDefaultRam.length > 0) {
-        // Chọn màu sắc đầu tiên làm màu mặc định
         setSelectedColor(colorsForDefaultRam[0]);
       }
     }
   }, [selectedRam, productData]);
+
   useEffect(() => {
-    // Lấy danh sách loại ROM unique từ dữ liệu sản phẩm
     const uniqueRoms: any = [
       ...new Set(
         productData.lstProductTypeAndPrice.map(
@@ -108,104 +98,75 @@ const Tag = ({ productData, onClick }: Props) => {
       setSelectedRom(uniqueRoms[0]);
     }
     if (!selectedRom && uniqueRoms.length > 0) {
-      // Nếu chưa chọn ROM, chọn ROM đầu tiên làm ROM mặc định
       setSelectedRom(uniqueRoms[0]);
 
-      // Lấy danh sách màu sắc tương ứng với ROM đầu tiên
       const colorsForDefaultRom = productData.lstProductTypeAndPrice
         .filter((item: any) => item.storageCapacity === uniqueRoms[0])
         .map((item: any) => item.color);
 
       if (colorsForDefaultRom && colorsForDefaultRom.length > 0) {
-        // Chọn màu sắc đầu tiên làm màu mặc định
         setSelectedColor(colorsForDefaultRom[0]);
       }
     }
   }, [selectedRom, productData]);
 
-  // useEffect(() => {
-  //   if (selectedRam !== null && selectedColor !== null) {
-  //     const selectedProduct =
-  //       productData.lstProductTypeAndPrice.find(
-  //         (item: any) =>
-  //           item.ram === selectedRam && item.color === selectedColor,
-  //       );
-
-  //     // if (selectedProduct) {
-  //     //   setPrice(selectedProduct.price);
-  //     //   setSalePrice(selectedProduct.salePrice);
-  //     //   onClick &&
-  //     //     onClick({
-  //     //       price: selectedProduct.price,
-  //     //       salePrice: selectedProduct.salePrice,
-  //     //     });
-  //     // }
-  //   }
-  // }, [selectedRam, selectedColor, productData, onClick]);
-  const findTypeId = () => {
+  useEffect(() => {
     const selectedProduct = productData.lstProductTypeAndPrice.find(
       (item: any) =>
-        item.ram === selectedRam &&
-        item.storageCapacity === selectedRom &&
-        item.color === selectedColor,
+        item.storageCapacity === selectedRom && item.color === selectedColor,
     );
 
-    return selectedProduct?.typeId || null;
-  };
-  const typeId = findTypeId();
-
-  useEffect(() => {
-    if (selectedRom !== null && selectedColor !== null) {
-      const selectedProduct = productData.lstProductTypeAndPrice.find(
-        (item: any) =>
-          item.storageCapacity === selectedRom && item.color === selectedColor,
-      );
-      //console.log(selectedProduct);
-      if (selectedProduct) {
-        setPrice(selectedProduct.price);
-        setSalePrice(selectedProduct.salePrice);
-        onClick &&
-          onClick({
-            price: selectedProduct.price,
-            salePrice: selectedProduct.salePrice,
-            selectedRom,
-            selectedColor,
-            selectedRam,
-            typeId,
-          });
-      }
+    if (selectedProduct) {
+      console.log(selectedProduct);
+      setPrice(selectedProduct.price);
+      setSalePrice(selectedProduct.salePrice);
+      setSelectedQuantity(selectedProduct.quantity);
+      setSelectedDepot(selectedProduct.depotId);
     } else {
-      onClick &&
-        onClick({
-          price,
-          salePrice,
-          selectedRom,
-          selectedColor,
-          selectedRam,
-          typeId,
-        });
+      setSelectedQuantity(null);
+      setSelectedDepot(null);
     }
+
+    onClick &&
+      onClick({
+        price,
+        salePrice,
+        selectedRom,
+        selectedColor,
+        selectedRam,
+        typeId: selectedProduct?.typeId || null,
+        selectedQuantity,
+        selectedDepot,
+      });
   }, [selectedRom, selectedColor, productData, onClick, selectedRam]);
+
   return (
     <div className="mb-4">
-      {salePrice > 0 && salePrice !== price ? (
-        <div className="mt-8 flex items-center bg-gray-50 px-5 py-4">
-          <div className="text-gray-500 line-through">
-            ₫{formatCurrency(price)}
-          </div>
-          <div className="ml-3 text-4xl font-medium text-mainColor">
-            ₫{formatCurrency(salePrice)}
-          </div>
-          <div className="ml-4 rounded-sm bg-orange-300 px-1 py-[2px] text-lg font-semibold uppercase text-black">
-            {rateSale(salePrice, price)} giảm
-          </div>
-        </div>
+      {!selectedQuantity ? (
+        <h1 className="text-4xl text-red-500">Hết hàng</h1>
       ) : (
-        <div className="mt-8 flex items-center bg-gray-50 px-5 py-4">
-          <div className="ml-3 text-4xl font-medium text-mainColor">
-            ₫{formatCurrency(price)}
-          </div>
-        </div>
+        <>
+          {" "}
+          {salePrice > 0 && salePrice !== price ? (
+            <div className="mt-8 flex items-center bg-gray-50 px-5 py-4">
+              <div className="text-gray-500 line-through">
+                ₫{formatCurrency(price)}
+              </div>
+              <div className="ml-3 text-4xl font-medium text-mainColor">
+                ₫{formatCurrency(salePrice)}
+              </div>
+              <div className="ml-4 rounded-sm bg-orange-300 px-1 py-[2px] text-lg font-semibold uppercase text-black">
+                {rateSale(salePrice, price)} giảm
+              </div>
+            </div>
+          ) : (
+            <div className="mt-8 flex items-center bg-gray-50 px-5 py-4">
+              <div className="ml-3 text-4xl font-medium text-mainColor">
+                ₫{formatCurrency(price)}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {productData.lstProductTypeAndPrice[0]?.ram != null && (
@@ -230,7 +191,7 @@ const Tag = ({ productData, onClick }: Props) => {
                 key={index}
                 onClick={() => {
                   setSelectedRam(ram);
-                  setSelectedColor(null); // Đặt màu sắc về null khi chọn loại RAM mới
+                  setSelectedColor(null);
                 }}
               >
                 {ram}
@@ -239,6 +200,7 @@ const Tag = ({ productData, onClick }: Props) => {
           })}
         </div>
       )}
+
       {productData.lstProductTypeAndPrice[0]?.storageCapacity != null && (
         <div className="flex flex-wrap gap-4 mb-4">
           {[
@@ -249,10 +211,7 @@ const Tag = ({ productData, onClick }: Props) => {
             ),
           ].map((rom: any, index) => {
             const active = rom === selectedRom;
-            const className = clsx(
-              "border  px-10 py-4 text-xl rounded",
-              // active && "text-blue-400 border-blue-400 ",
-            );
+            const className = clsx("border  px-10 py-4 text-xl rounded");
 
             return (
               <Button
@@ -261,11 +220,10 @@ const Tag = ({ productData, onClick }: Props) => {
                   border: (active && `1px solid ${PRIMARY_MAIN}`) || "",
                 }}
                 className={className}
-                // type={active ? "primary" : "default"}
                 key={index}
                 onClick={() => {
                   setSelectedRom(rom);
-                  setSelectedColor(null); // Đặt màu sắc về null khi chọn loại RoM mới
+                  setSelectedColor(null);
                 }}
               >
                 {rom}
@@ -275,41 +233,13 @@ const Tag = ({ productData, onClick }: Props) => {
         </div>
       )}
 
-      {/* <div className="flex flex-wrap gap-4 ">
-        {productData.lstProductTypeAndPrice
-          .filter((item: any) => item.ram === selectedRam)
-          .map((product: any, index: number) => {
-            const active = product.color === selectedColor;
-            const className = clsx(
-              "border  px-10 py-4 text-xl rounded",
-              active && "text-blue-400 border-blue-400 ",
-            );
-
-            return (
-              <Button
-                className={className}
-                // type={active ? "primary" : "default"}
-                key={index}
-                onClick={() => {
-                  setSelectedColor(product.color);
-                }}
-                disabled={product.quantity === 0} // Ví dụ: Disable nút nếu hết hàng
-              >
-                {product.color}
-              </Button>
-            );
-          })}
-      </div> */}
       {productData.lstProductTypeAndPrice[0]?.color != null && (
-        <div className="flex flex-wrap gap-4 ">
+        <div className="flex flex-wrap gap-4">
           {productData.lstProductTypeAndPrice
             .filter((item: any) => item.storageCapacity === selectedRom)
             .map((product: any, index: number) => {
               const active = product.color === selectedColor;
-              const className = clsx(
-                "border  px-10 py-4 text-xl rounded",
-                // active && "text-blue-400 border-blue-400 ",
-              );
+              const className = clsx("border  px-10 py-4 text-xl rounded");
 
               return (
                 <Button
@@ -318,12 +248,10 @@ const Tag = ({ productData, onClick }: Props) => {
                     border: (active && `1px solid ${PRIMARY_MAIN}`) || "",
                   }}
                   className={className}
-                  // type={active ? "primary" : "default"}
                   key={index}
                   onClick={() => {
                     setSelectedColor(product.color);
                   }}
-                  disabled={product.quantity === 0} // Ví dụ: Disable nút nếu hết hàng
                 >
                   {product.color}
                 </Button>

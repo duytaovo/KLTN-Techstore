@@ -93,14 +93,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
   } = useForm({
     resolver: yupResolver(schemaChangeProduct),
   });
-  const {
-    handleSubmit: handleSubmitChangeAndReturnProduct,
-    formState: { errors: errorChangeAndReturnProduct },
-    register: registerChangeAndReturnProduct,
-    setValue: setValueChangeAndReturnProduct,
-  } = useForm({
-    resolver: yupResolver(schemaChangeProduct),
-  });
+
   const dispatch = useAppDispatch();
   const [file, setFile] = useState<File[]>();
   const [mainCauseChangeProduct, setMainCauseChangeProduct] = useState<
@@ -247,16 +240,25 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
   });
 
   const onSubmitChangeProduct = handleSubmitChangeProduct(async (data) => {
+    console.log(typeChangeProductChangeAndReturn)
     // setIsSubmittingChangeProduct(true);
-    const body = {
+    const body1 = {
       orderProductId: idProduct,
-      type: typeChangeProduct,
-      mainCause: mainCauseChangeProduct,
-      quantity: quantityChange,
+      type: typeChangeProductChangeAndReturn,
+      mainCause: typeChangeProductChangeAndReturn,
+      quantity: quantityReturn,
       customerDescription: data?.customerDescription,
     };
+    console.log(body1)
+    // const body2 = {
+    //   orderProductId: idProduct,
+    //   type: typeChangeProductChangeAndReturn[0],
+    //   mainCause: typeChangeProductChangeAndReturn[0],
+    //   quantity: quantityReturn,
+    //   customerDescription: data?.customerDescription,
+    // };
     try {
-      const res = await dispatch(changeProductOrders([body]));
+      const res = await dispatch(changeProductOrders([body1]));
       unwrapResult(res);
       const d = res?.payload?.data;
       if (d?.code !== 200) return toast.error(d?.message);
@@ -285,11 +287,11 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
       const isCheckBody1 =
         typeChangeProductChangeAndReturn[0] !== undefined &&
         mainCauseChangeAndReturnProduct[0] !== undefined &&
-        quantityChange !== 0;
+        quantityReturn !== 0;
       const isCheckBody2 =
         typeChangeProductChangeAndReturn[1] !== undefined &&
         mainCauseChangeAndReturnProduct[1] !== undefined &&
-        quantityReturn !== 0;
+        quantityChange !== 0;
       if (quantityChange + quantityReturn === 1) {
         if (isCheckBody1 && isCheckBody2) {
           toast.error(
@@ -298,9 +300,8 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
           return;
         }
       }
-
-      console.log(isCheckBody1);
-      console.log(isCheckBody2);
+      console.log(typeChangeProductChangeAndReturn);
+      console.log(mainCauseChangeAndReturnProduct);
 
       const body1 = {
         orderProductId: idProduct,
@@ -514,7 +515,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
             )} */}
           </p>
         </div>
-        <p className="text-2xl">Mua tại docongnghe.com</p>
+        {/* <p className="text-2xl">Mua tại docongnghe.com</p> */}
       </div>
 
       {order?.orderDetails?.map((item: any, index: number) => {
@@ -537,7 +538,8 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                   Bộ nhớ trong: {item.storageCapacity}
                 </p>
                 <p className="font-medium text-xl">Số lượng: {item.quantity}</p>
-                {order.orderStatus != 0 && order.orderStatus == 11 ? (
+
+                {order.orderStatus != 0 && order.orderStatus >= 11 ? (
                   <div className="flex items-start  flex-col">
                     {(item.feedbackId == null && order.orderStatus == 21) ||
                     (item.feedbackId == null && order.orderStatus == 22) ? (
@@ -569,38 +571,41 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                       ))
                     )}
 
-                    {order.orderStatus !== 21 && (
-                      <div className="flex flex-col">
-                        <Button
-                          className="ml-0 p-0 border-2"
-                          onClick={() => {
-                            setIdProduct(item.orderProductId);
-                            setIsModalOpenChangAndReturnProduct(true);
-                          }}
-                          type="link"
-                        >
-                          Đổi / Trả hàng
-                        </Button>
-                        <Button
-                          className="ml-0 p-0 border-2"
-                          onClick={() => handleReceived(order.id)}
-                          type="link"
-                        >
-                          Đã nhận hàng
-                        </Button>
-                        {order.orderStatus == 1 && (
+                    {order.orderStatus < 21 &&
+                      order.orderStatus != 12 &&
+                      order.orderStatus != 15 &&
+                      order.orderStatus != 18 && (
+                        <div className="flex flex-col">
                           <Button
                             className="ml-0 p-0 border-2"
                             onClick={() => {
-                              handleCancelOrder(order.id);
+                              setIdProduct(item.orderProductId);
+                              setIsModalOpenChangAndReturnProduct(true);
                             }}
                             type="link"
                           >
-                            Huỷ đơn hàng
+                            Đổi / Trả hàng
                           </Button>
-                        )}
-                      </div>
-                    )}
+                          <Button
+                            className="ml-0 p-0 border-2"
+                            onClick={() => handleReceived(order.id)}
+                            type="link"
+                          >
+                            Đã nhận hàng
+                          </Button>
+                          {order.orderStatus == 1 && (
+                            <Button
+                              className="ml-0 p-0 border-2"
+                              onClick={() => {
+                                handleCancelOrder(order.id);
+                              }}
+                              type="link"
+                            >
+                              Huỷ đơn hàng
+                            </Button>
+                          )}
+                        </div>
+                      )}
                   </div>
                 ) : null}
               </div>
@@ -635,7 +640,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                   // rules={[{ required: true }]}
                 >
                   <Select
-                    mode="multiple"
+                    // mode="multiple"
                     showSearch
                     style={{ width: "60%" }}
                     placeholder="Chọn loại"
@@ -652,7 +657,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                     ]}
                   />
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                   label="Lý do"
                   name="mainCause"
                   // rules={[{ required: true }]}
@@ -674,7 +679,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                       },
                     ]}
                   />
-                </Form.Item>
+                </Form.Item> */}
 
                 <Form.Item
                   label="Số lượng trả"
@@ -703,7 +708,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                     </button>
                   </div>
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                   label="Số lượng đổi"
                   name="quantityChange"
                   // rules={[{ required: true }]}
@@ -729,7 +734,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                       +
                     </button>
                   </div>
-                </Form.Item>
+                </Form.Item> */}
 
                 <Form.Item
                   label="Mô tả"
@@ -749,7 +754,7 @@ const OrderDetail = ({ order, index, setOrderDetail }: Props) => {
                   <Form.Item label="" className=" mb-2">
                     <Button
                       className="w-[100px]"
-                      onClick={onSubmitChangeAndReturnProduct}
+                      onClick={onSubmitChangeProduct}
                       type="dashed"
                     >
                       {isSubmitingChangeProduct ? " Loading..." : "Submit"}

@@ -37,7 +37,7 @@ export default function QuantityController({
     if (max !== undefined && _value > max) {
       _value = max;
     }
-    onIncrease && onIncrease(Number(value || localValue) + 1);
+    onIncrease && onIncrease(_value);
     setLocalValue(_value);
   };
 

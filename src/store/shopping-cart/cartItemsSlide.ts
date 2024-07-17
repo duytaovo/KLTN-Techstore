@@ -31,6 +31,11 @@ export const getProductsFilterAccess = createAsyncThunk(
   payloadCreator(cartService.getProductsFilterAccess),
 );
 
+export const checkCart = createAsyncThunk(
+  "cartItems/checkCart",
+  payloadCreator(cartService.checkCart),
+);
+
 interface Cart {
   value: any[];
   valueBuy: any[];
@@ -143,6 +148,7 @@ export const cartItemsSlice = createSlice({
       }
     },
     removeItem: (state, action) => {
+      console.log(action.payload)
       const itemToRemove = action.payload;
       state.value = state.value.filter(
         (e: any) =>

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import path from "src/constants/path";
-import { Purchase } from "src/types/purchase.type";
+import { ExtendedPurchase, Purchase } from "src/types/purchase.type";
 import { formatCurrency, generateNameId } from "src/utils/utils";
 import produce from "immer";
 import keyBy from "lodash/keyBy";
@@ -13,19 +13,75 @@ import QuantityController from "./QuantityController";
 import Button from "../Auth/Button";
 import {
   addItemBuy,
+  checkCart,
   removeItem,
   updateItem,
 } from "src/store/shopping-cart/cartItemsSlide";
 import { useTheme } from "@material-ui/core";
-
+import { Helmet } from "react-helmet-async";
+import axios from "axios";
+import { message, Modal } from "antd";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { getDetailProduct } from "src/store/product/productsSlice";
+import { ProductDetail } from "src/types/allProductsType.interface";
+interface Warning {
+  productId: number;
+  typeId: number;
+  depotId: number;
+  cartQuantity: number;
+  stockQuantity: number;
+}
 export default function CartNew() {
   const theme = useTheme();
   const PRIMARY_MAIN = theme.palette.primary.main;
   const { extendedPurchases, setExtendedPurchases } = useContext(AppContext);
   const [purchasesInCartData, setPurchasesInCartData] = useState<[]>([]);
+  const [purchasesInNotGood, setPurchasesInNotGood] = useState<
+    ExtendedPurchase[]
+  >([]);
+  console.log(purchasesInNotGood);
+  const [warnings, setWarnings] = useState<Warning[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const dispatch = useAppDispatch();
   const product_add: any = useAppSelector((state) => state.cartItems.value);
+  const productsToCheck = product_add?.map((product: any) => ({
+    productId: product.product_id,
+    typeId: product.typeId,
+    depotId: product.depotId,
+    quantity: product.quantity,
+  }));
+  const handleCheckCart_DB = async () => {
+    const _res = await dispatch(checkCart(productsToCheck));
+    unwrapResult(_res);
+    setWarnings(_res?.payload?.data?.data?.productIdNotGoods);
+    return;
+  };
+  useEffect(() => {
+    handleCheckCart_DB();
+  }, [product_add]);
+  const handleCheckCartLocal = async () => {
+    if (warnings?.length > 0) {
+      setIsModalVisible(true);
+      const filteredProducts = product_add.filter((product: any) =>
+        warnings.some(
+          (warning: Warning) =>
+            warning.productId === product.product_id &&
+            warning.typeId === product.typeId &&
+            warning.depotId === product.depotId,
+        ),
+      );
+      setPurchasesInNotGood([...filteredProducts]);
+      return;
+    }
+  };
+  useEffect(() => {
+    handleCheckCartLocal();
+  }, [warnings]);
+
   const navigate = useNavigate();
+  useEffect(() => {
+    setPurchasesInCartData(product_add);
+  }, [product_add]);
 
   useEffect(() => {
     setPurchasesInCartData(product_add);
@@ -166,34 +222,88 @@ export default function CartNew() {
     });
   };
 
+  const body2 = checkedPurchases.map((purchase) => ({
+    productId: purchase.product_id,
+    typeId: purchase.typeId,
+    depotId: purchase.depotId,
+    quantity: purchase.quantity,
+  }));
+
   const handleBuyPurchases = async () => {
-    if (checkedPurchases.length > 0) {
-      const body = checkedPurchases.map((purchase) => ({
-        product_id: purchase.product_id,
-        quantity: purchase.quantity,
-        price: purchase.price,
-        salePrice: purchase.salePrice,
-        selectedRom: purchase.selectedRom,
-        selectedColor: purchase.selectedColor,
-        selectedRam: purchase.selectedRam,
-        mass: purchase.mass,
-        dimension: purchase.dimension,
-        typeId: purchase?.typeId,
-        depotId: purchase.depotId,
-        totalCheckedPurchasePrice: totalCheckedPurchasePrice,
-      }));
-      dispatch(addItemBuy(body));
-      // checkedPurchases.map((purchase) => dispatch(removeItem(purchase)));
-      navigate(path.payment);
+    const body = checkedPurchases.map((purchase) => ({
+      product_id: purchase.product_id,
+      quantity: purchase.quantity,
+      price: purchase.price,
+      salePrice: purchase.salePrice,
+      selectedRom: purchase.selectedRom,
+      selectedColor: purchase.selectedColor,
+      selectedRam: purchase.selectedRam,
+      mass: purchase.mass,
+      dimension: purchase.dimension,
+      typeId: purchase?.typeId,
+      depotId: purchase.depotId,
+      totalCheckedPurchasePrice: totalCheckedPurchasePrice,
+    }));
+    const _res = await dispatch(checkCart(body2));
+    unwrapResult(_res);
+    if (_res?.payload?.data?.data?.productIdNotGoods.length > 0) {
+      setIsModalVisible(true);
+      const filteredProducts = product_add.filter(
+        (product: any) =>
+          _res?.payload?.data?.data?.productIdNotGoods.some(
+            (warning: Warning) =>
+              warning.productId === product.product_id &&
+              warning.typeId === product.typeId &&
+              warning.depotId === product.depotId,
+          ),
+      );
+      setPurchasesInNotGood(filteredProducts);
+      return;
     } else {
-      toast.error("Vui lòng chọn sản phẩm", {
-        autoClose: 1000,
-      });
+      if (checkedPurchases.length > 0) {
+        dispatch(addItemBuy(body));
+        navigate(path.payment);
+      } else {
+        toast.error("Vui lòng chọn sản phẩm", {
+          autoClose: 1000,
+        });
+      }
     }
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    proceedToCheckout();
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    message.info("Hủy mua hàng.");
+  };
+
+  const proceedToCheckout = () => {
+    purchasesInNotGood.forEach((product) => {
+      const warning = warnings.find(
+        (w) =>
+          w.productId === product.product_id &&
+          w.typeId === product.typeId &&
+          w.depotId === product.depotId,
+      );
+      if (warning && warning.stockQuantity === 0) {
+        dispatch(removeItem(product)); // Gọi action để xoá sản phẩm khỏi giỏ hàng
+      } else if (warning) {
+        dispatch(updateItem({ ...product, quantity: warning.stockQuantity }));
+      }
+    });
+    setPurchasesInCartData(product_add);
   };
 
   return (
     <div className="bg-neutral-100 py-16 px-28">
+      <Helmet>
+        <title>Giỏ hàng </title>
+        <meta name="description" content="Trang đăng nhập" />
+      </Helmet>
       <div className=" text-black">
         {extendedPurchases.length > 0 ? (
           <>
@@ -417,6 +527,94 @@ export default function CartNew() {
                   Mua hàng
                 </Button>
               </div>
+              <Modal
+                title="Cảnh báo các sản phẩm này số lượng hàng cần mua vượt quá số lượng còn lại trong kho !! "
+                open={isModalVisible}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={800}
+                okText="Cập nhật giỏ hàng"
+                cancelText="Hủy"
+                className="text-black"
+              >
+                {purchasesInNotGood?.map((purchase, index) => (
+                  <div
+                    key={purchase.id}
+                    className="mb-5 grid grid-cols-12 items-center rounded-sm border border-gray-200 bg-white py-5 px-4 text-center text-2xl text-gray-500 first:mt-0"
+                  >
+                    <div className="col-span-6">
+                      <div className="flex">
+                        <div className="flex-grow">
+                          <div className="flex">
+                            <Link
+                              className="h-20 w-20 flex-shrink-0"
+                              to={`${`/${purchase.slug}/detail`}/${generateNameId(
+                                {
+                                  slug: purchase.slug,
+                                  name: purchase.name,
+                                  id: purchase.id.toString(),
+                                },
+                              )}`}
+                            >
+                              <img alt={purchase.name} src={purchase.image} />
+                            </Link>
+                            <div className="flex-grow px-2  ">
+                              <Link
+                                to={`${`/${purchase.slug}/detail`}/${generateNameId(
+                                  {
+                                    slug: purchase.slug,
+                                    name: purchase.name,
+                                    id: purchase.id.toString(),
+                                  },
+                                )}`}
+                                className="text-left line-clamp-2 "
+                              >
+                                <div className="">
+                                  <span className="mr-2">{purchase.name}</span>
+                                  <span>{purchase.selectedRom}</span>
+                                </div>
+                                <span className="text-blue-500">
+                                  {purchase.selectedColor}
+                                </span>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-span-3">
+                      <div className="grid grid-cols-5 items-center">
+                        <div className="col-span-2">
+                          <div className="flex items-center justify-center">
+                            {purchase.salePrice > 0 ? (
+                              <span className="text-red-600">
+                                ₫
+                                {formatCurrency(
+                                  purchase.salePrice * purchase.quantity,
+                                )}
+                              </span>
+                            ) : (
+                              <span className="text-red-600">
+                                ₫
+                                {formatCurrency(
+                                  purchase.price * purchase.quantity,
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-span-3 ">
+                      <div className="flex items-center justify-start">
+                        <span className="mx-4 text-red-500">
+                          Còn lại: {warnings[index]?.stockQuantity}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </Modal>
             </div>
           </>
         ) : (

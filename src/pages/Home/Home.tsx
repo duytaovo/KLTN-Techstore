@@ -68,8 +68,8 @@ const Home = ({ title }: { title: string }) => {
           <div>
             <MainSlider />
             <Ticket show={displayTicket} />
-            <Promo />
-            <ProductTrend />
+            {/* <Promo /> */}
+            {/* <ProductTrend /> */}
           </div>
         )}
         <PromoFirst />

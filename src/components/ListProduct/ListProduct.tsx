@@ -10,7 +10,7 @@ type Props = {
   isSlide: boolean;
   products: any;
   category?: string;
-  handlePageChange?: any;
+  handlePageChange: any;
   currentPage?: number;
 };
 const ListProduct = ({
@@ -29,7 +29,6 @@ const ListProduct = ({
   const handlePageChangeLocal = (page: number) => {
     handlePageChange && handlePageChange(page - 1);
   };
-  const { value } = useAppSelector((state) => state.loading);
 
   return (
     <>

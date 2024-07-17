@@ -29,6 +29,10 @@ const PromoFirst = () => {
     );
   }, [currentPage]);
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <Section styles={`rounded-xl overflow-hidden `}>
       <>
@@ -76,6 +80,7 @@ const PromoFirst = () => {
               isSlide={false}
               category={""}
               currentPage={currentPage}
+              handlePageChange={handlePageChange}
             />
           )}
         </div>

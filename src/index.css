@@ -129,7 +129,10 @@ input[type="number"]::-webkit-outer-spin-button {
   line-height: 1;
   color: white !important;
 }
-
+.ant-btn-primary {
+  color: white !important;
+  background: green;
+}
 .swiper-button-prev,
 .swiper-button-next {
   width: 40px !important;

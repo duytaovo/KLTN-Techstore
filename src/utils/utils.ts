@@ -47,7 +47,7 @@ export function isAxiosExpiredTokenError<UnauthorizedError>(
 
 const removeSpecialCharacter = (str: string) =>
   // eslint-disable-next-line no-useless-escape
-  str.replace(
+  str?.replace(
     /!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g,
     "",
   );
@@ -90,7 +90,7 @@ export const generateNameId = ({
   // idCategory: string | number;
 }) => {
   return (
-    removeSpecialCharacter(name).replace(/\s/g, "-") +
+    removeSpecialCharacter(name)?.replace(/\s/g, "-") +
     // `-slug-${slug}` +
     // `-idCategory-${idCategory}` +
     `-id-${id}`

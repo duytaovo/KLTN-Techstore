@@ -11,5 +11,9 @@ export const cartService = {
   getProductsFilterAccess({ body, params }: any) {
     return httpNew.post(`/search/filter`, body, { params: params });
   },
+
+  checkCart(body: any) {
+    return httpNew.post(`/product/check-cart`, body);
+  },
 };
 

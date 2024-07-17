@@ -10,6 +10,7 @@ import { ErrorResponse } from "src/types/utils.type";
 import { schemaPayment } from "src/utils/rules";
 import {
   formatCurrency,
+  generateNameId,
   isAxiosUnprocessableEntityError,
 } from "src/utils/utils";
 import SelectCustom from "src/components/Select";
@@ -20,11 +21,17 @@ import path from "src/constants/path";
 import { LocationForm } from "src/components/LocationForm";
 import axios from "axios";
 import config from "src/constants/configApi";
-import { Button, Modal } from "antd";
-import { removeItem } from "src/store/shopping-cart/cartItemsSlide";
+import { Button, List, message, Modal } from "antd";
+import {
+  checkCart,
+  removeItem,
+  updateItem,
+} from "src/store/shopping-cart/cartItemsSlide";
 import { useTheme } from "@material-ui/core";
 import { getVoucherUser } from "src/store/voucher/voucherSlice";
 import { Select } from "antd";
+import { Helmet } from "react-helmet-async";
+import { ExtendedPurchase } from "src/types/purchase.type";
 interface FormData {}
 
 interface DataVoucherUser {
@@ -47,10 +54,27 @@ interface DataVoucherUser {
 }
 
 interface VoucherType {
-  label: string;
   value: string;
+  label: string;
 }
 
+interface VoucherTypeCheck {
+  code: string;
+  discount: number;
+  endDate: string;
+  gift: string;
+  id: number;
+  name: string;
+  price: number;
+  startDate: string;
+}
+interface Warning {
+  productId: number;
+  typeId: number;
+  depotId: number;
+  cartQuantity: number;
+  stockQuantity: number;
+}
 const Payment: React.FC = () => {
   const theme = useTheme();
   const PRIMARY_MAIN = theme.palette.primary.main;
@@ -60,9 +84,21 @@ const Payment: React.FC = () => {
   const [voucherPercent, setVoucherPercent] = useState<number | string>(0);
   const [voucherFormat, setVoucherFormat] = useState<string>("price");
   const [voucherOfUser, setVoucherOfUser] = useState<VoucherType[]>([]);
+  const [voucherOfUserCheck, setVoucherOfUserCheck] = useState<
+    VoucherTypeCheck[]
+  >([]);
+  const [expiringVouchers, setExpiringVouchers] = useState<VoucherTypeCheck[]>(
+    [],
+  );
+  const [expiredVouchers, setExpiredVouchers] = useState<VoucherTypeCheck[]>(
+    [],
+  );
+  const [isModalVisibleVoucher, setIsModalVisibleVoucher] =
+    useState<boolean>(false);
   const [voucherOfUserPercent, setVoucherOfUserPercent] = useState<
     VoucherType[]
   >([]);
+  console.log(voucherOfUserCheck);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -80,7 +116,6 @@ const Payment: React.FC = () => {
       (acc: any, curr: any) => Number(acc) + Number(curr),
       0,
     );
-    console.log(_value);
     setVoucherPrice(_value);
   };
 
@@ -112,7 +147,6 @@ const Payment: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { valueBuy } = useAppSelector((state) => state.cartItems);
-
   const product_add: any = useAppSelector((state) => state.cartItems.value);
   const { profile, userWithId } = useAppSelector((state) => state.user);
   const [addressOption, setAddresOption] = useState<any>();
@@ -120,6 +154,7 @@ const Payment: React.FC = () => {
   const [part1Address, setPart1Address] = useState<any>();
   const [part2Address, setPart2Address] = useState<any>();
   const [part3Address, setPart3Address] = useState<any>();
+
   const addressSelect =
     addressOption?.ward.name +
     ", " +
@@ -276,7 +311,7 @@ const Payment: React.FC = () => {
       await dispatch(getVoucherUser(""))
         .unwrap()
         .then(async (data: any) => {
-          console.log(data?.data?.data);
+          setVoucherOfUserCheck(data?.data?.data);
           const _dataPrice = await data?.data?.data
             .filter((item: any) => item?.price && item.price > 0) // Filter items with valid prices
             .map((item: any) => ({
@@ -300,6 +335,38 @@ const Payment: React.FC = () => {
     };
     _getData();
   }, []);
+  useEffect(() => {
+    const checkVoucherExpiry = () => {
+      const now = new Date();
+      const expiring: VoucherTypeCheck[] = [];
+      const expired: VoucherTypeCheck[] = [];
+
+      voucherOfUserCheck?.forEach((voucher) => {
+        const endDate = new Date(voucher.endDate);
+        const daysToExpire =
+          (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+
+        if (daysToExpire <= 1 && daysToExpire > 0) {
+          expiring.push(voucher);
+        } else if (daysToExpire <= 0) {
+          expired.push(voucher);
+        }
+      });
+
+      setExpiringVouchers(expiring);
+      setExpiredVouchers(expired);
+      if (expiring.length > 0 || expired.length > 0) {
+        setIsModalVisibleVoucher(true); // Show modal if there are expiring or expired vouchers
+      }
+    };
+
+    const interval = setInterval(checkVoucherExpiry, 24 * 60 * 60 * 1000); // Check every day
+
+    // Initial check when component mounts
+    checkVoucherExpiry();
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [voucherOfUserCheck]);
 
   const totalPurchasePrice = useMemo(
     () =>
@@ -311,69 +378,149 @@ const Payment: React.FC = () => {
       }, 0),
     [valueBuy],
   );
+  const handleCheckCart = async () => {
+    if (warnings?.length > 0) {
+      setIsModalVisible(true);
+      const filteredProducts = valueBuy.filter((product: any) =>
+        warnings.some(
+          (warning: Warning) =>
+            warning.productId === product.product_id &&
+            warning.typeId === product.typeId &&
+            warning.depotId === product.depotId,
+        ),
+      );
+      setPurchasesInNotGood(filteredProducts);
+      return;
+    }
+  };
+  const body2 = valueBuy?.map((purchase) => ({
+    productId: purchase.product_id,
+    typeId: purchase.typeId,
+    depotId: purchase.depotId,
+    quantity: purchase.quantity,
+  }));
   const onSubmit = handleSubmit(async (data) => {
-    const deliveryPrice = fee;
-    const discountPrice: number | string = voucher;
-    const discountPercent: number | string = voucherPercent;
+    const _res = await dispatch(checkCart(body2));
+    unwrapResult(_res);
+    if (_res?.payload?.data?.data?.productIdNotGoods.length > 0) {
+      setIsModalVisible(true);
+      const filteredProducts = valueBuy.filter(
+        (product: any) =>
+          _res?.payload?.data?.data?.productIdNotGoods.some(
+            (warning: Warning) =>
+              warning.productId === product.product_id &&
+              warning.typeId === product.typeId &&
+              warning.depotId === product.depotId,
+          ),
+      );
+      setPurchasesInNotGood(filteredProducts);
+      return;
+    } else {
+      const deliveryPrice = fee;
+      const discountPrice: number | string = voucher;
+      const discountPercent: number | string = voucherPercent;
 
-    // console.log(discount);
-    setIsModalOpen(true);
-    const finalPrice =
-      totalPurchasePrice + deliveryPrice - Number(discountPrice);
-    const body = JSON.stringify({
-      nameReceiver: data.nameReceiver,
-      phoneReceiver: data.phoneReceiver,
-      addressReceiver: data.addressReceiver + ", " + addressSelect,
-      message: data.message,
-      orderPrice: Number(totalPurchasePrice),
-      deliveryPrice,
-      discount: Number(discountPrice),
-      finalPrice,
-      userId: Number(profile.id),
-      paymentMethod: Number(data.paymentMethod),
-      orderProducts: valueBuy?.map((item) => ({
-        productId: Number(item.product_id),
-        typeId: Number(item.typeId),
-        depotId: Number(item.depotId),
-        quantity: Number(item.quantity),
-      })),
-    });
-    try {
+      // console.log(discount);
       setIsModalOpen(true);
-      setIsSubmitting(true);
-      const res = await dispatch(buyPurchases(body));
-      unwrapResult(res);
-      const d = res?.payload?.data;
-      if (d?.code !== 200) return toast.error(d?.message);
-      localStorage.removeItem("cartItemsBuy");
-      valueBuy.map((purchase) => dispatch(removeItem(purchase)));
+      const finalPrice =
+        totalPurchasePrice + deliveryPrice - Number(discountPrice);
+      const body = JSON.stringify({
+        nameReceiver: data.nameReceiver,
+        phoneReceiver: data.phoneReceiver,
+        addressReceiver: data.addressReceiver + ", " + addressSelect,
+        message: data.message,
+        orderPrice: Number(totalPurchasePrice),
+        deliveryPrice,
+        discount: Number(discountPrice),
+        finalPrice,
+        userId: Number(profile.id),
+        paymentMethod: Number(data.paymentMethod),
+        orderProducts: valueBuy?.map((item) => ({
+          productId: Number(item.product_id),
+          typeId: Number(item.typeId),
+          depotId: Number(item.depotId),
+          quantity: Number(item.quantity),
+        })),
+      });
+      try {
+        setIsModalOpen(true);
+        setIsSubmitting(true);
+        const res = await dispatch(buyPurchases(body));
+        unwrapResult(res);
+        const d = res?.payload?.data;
+        if (d?.code !== 200) return toast.error(d?.message);
+        localStorage.removeItem("cartItemsBuy");
+        valueBuy.map((purchase) => dispatch(removeItem(purchase)));
 
-      if (Number(data.paymentMethod) === 1) {
-        toast.success("Đặt hàng thành công.");
-        navigate(path.home);
-        return;
-      }
-      window.location.href = d.data.paymentUrl;
-    } catch (error: any) {
-      if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
-        const formError = error.response?.data.data;
-        if (formError) {
-          Object.keys(formError).forEach((key) => {
-            setError(key as keyof FormData, {
-              message: formError[key as keyof FormData],
-              type: "Server",
-            });
-          });
+        if (Number(data.paymentMethod) === 1) {
+          toast.success("Đặt hàng thành công.");
+          navigate(path.home);
+          return;
         }
+        window.location.href = d.data.paymentUrl;
+      } catch (error: any) {
+        if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
+          const formError = error.response?.data.data;
+          if (formError) {
+            Object.keys(formError).forEach((key) => {
+              setError(key as keyof FormData, {
+                message: formError[key as keyof FormData],
+                type: "Server",
+              });
+            });
+          }
+        }
+      } finally {
+        setTimeout(() => setIsSubmitting(false), 3000);
+        handleOk();
       }
-    } finally {
-      setTimeout(() => setIsSubmitting(false), 3000);
-      handleOk();
     }
   });
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [warnings, setWarnings] = useState<Warning[]>([]);
+  const [purchasesInNotGood, setPurchasesInNotGood] = useState<
+    ExtendedPurchase[]
+  >([]);
+  const productsToCheck = valueBuy?.map((product: any) => ({
+    productId: product.product_id,
+    typeId: product.typeId,
+    depotId: product.depotId,
+    quantity: product.quantity,
+  }));
+  useEffect(() => {
+    const handleCheckCart = async () => {
+      const _res = await dispatch(checkCart(productsToCheck));
+      unwrapResult(_res);
+      setWarnings(_res?.payload?.data?.data?.productIdNotGoods);
+    };
+    handleCheckCart();
+  }, [valueBuy]);
+  useEffect(() => {
+    handleCheckCart();
+  }, [warnings]);
+  const handleCancelBuy = () => {
+    purchasesInNotGood.forEach((product) => {
+      const warning = warnings.find(
+        (w) =>
+          w.productId === product.product_id &&
+          w.typeId === product.typeId &&
+          w.depotId === product.depotId,
+      );
+      if (warning && warning.stockQuantity === 0) {
+        dispatch(removeItem(product)); // Gọi action để xoá sản phẩm khỏi giỏ hàng
+      } else if (warning) {
+        dispatch(updateItem({ ...product, quantity: warning.stockQuantity }));
+      }
+    });
+    setIsModalVisible(false);
+    message.info("Hủy mua hàng.");
+  };
   return (
     <div className=" bg-mainBackGroundColor/30 ">
+      <Helmet>
+        <title>Trang thanh toán </title>
+        <meta name="description" content="Trang đăng nhập" />
+      </Helmet>
       <div className="w-1/2 m-auto">
         <div className="flex justify-between py-4">
           <Link
@@ -625,7 +772,108 @@ const Payment: React.FC = () => {
       >
         <p>Đang xử lý, vui lòng đợi...</p>
       </Modal>
+      <Modal
+        title="Số lượng hàng cần mua vượt quá số lượng còn lại trong kho !! "
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancelBuy}
+        okText="Tiếp tục mua"
+        cancelText="Hủy"
+        className="text-black"
+      >
+        {purchasesInNotGood?.map((purchase, index) => (
+          <div
+            key={purchase.id}
+            className="mb-5 grid grid-cols-12 items-center rounded-sm border border-gray-200 bg-white py-5 px-4 text-center text-2xl text-gray-500 first:mt-0"
+          >
+            <div className="col-span-6">
+              <div className="flex">
+                <div className="flex-grow">
+                  <div className="flex">
+                    <Link
+                      className="h-20 w-20 flex-shrink-0"
+                      to={`${`/${purchase.slug}/detail`}/${generateNameId({
+                        slug: purchase.slug,
+                        name: purchase.name,
+                        id: purchase?.id?.toString(),
+                      })}`}
+                    >
+                      <img alt={purchase.name} src={purchase.image} />
+                    </Link>
+                    <div className="flex-grow px-2  ">
+                      <Link
+                        to={`${`/${purchase.slug}/detail`}/${generateNameId({
+                          slug: purchase.slug,
+                          name: purchase.name,
+                          id: purchase?.id?.toString(),
+                        })}`}
+                        className="text-left line-clamp-2 "
+                      >
+                        <div className="">
+                          <span className="mr-2">{purchase.name}</span>
+                          <span>{purchase.selectedRom}</span>
+                        </div>
+                        <span className="text-blue-500">
+                          {purchase.selectedColor}
+                        </span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-span-6">
+              <div className="grid grid-cols-5 items-center">
+                <div className="col-span-2">
+                  <div className="flex items-center justify-center">
+                    <span className="text-gray-300 line-through">
+                      ₫{formatCurrency(purchase.price)}
+                    </span>
+                    {purchase.salePrice > 0 &&
+                      purchase.salePrice !== purchase.price && (
+                        <span className="ml-3">
+                          ₫{formatCurrency(purchase.salePrice)}
+                        </span>
+                      )}
+                  </div>
+                </div>
 
+                <div className="col-span-2">
+                  {purchase.salePrice > 0 ? (
+                    <span className="text-red-600">
+                      ₫{formatCurrency(purchase.salePrice * purchase.quantity)}
+                    </span>
+                  ) : (
+                    <span className="text-red-600">
+                      ₫{formatCurrency(purchase.price * purchase.quantity)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </Modal>
+      <Modal
+        title="Thông báo thời hạn của voucher !!!"
+        open={isModalVisibleVoucher}
+        onOk={() => setIsModalVisibleVoucher(false)}
+        onCancel={() => setIsModalVisibleVoucher(false)}
+      >
+        <List
+          header={<h3 className="font-bold text-2xl">Sắp hết hạn</h3>}
+          dataSource={expiringVouchers}
+          renderItem={(item) => (
+            <List.Item>{item.name} - Sẽ hết hạn trong 1 ngày nữa!!</List.Item>
+          )}
+        />
+
+        <List
+          header={<h3 className="font-bold text-2xl">Đã hết hạn</h3>}
+          dataSource={expiredVouchers}
+          renderItem={(item) => <List.Item>{item.name} - ĐÃ HẾT HẠN</List.Item>}
+        />
+      </Modal>
       {/* <InvoiceToolbar invoice={valueBuy} /> */}
     </div>
   );
