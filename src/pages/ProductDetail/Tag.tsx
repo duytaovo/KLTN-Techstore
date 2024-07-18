@@ -42,7 +42,7 @@ const Tag = ({ productData, onClick }: Props) => {
         ...new Set(
           productData.lstProductTypeAndPrice.map((item: any) => item.ram),
         ),
-      ];
+      ].sort((a, b) => parseInt(a) - parseInt(b)); // Sort RAM options numerically
       if (uniqueRams.length > 0) {
         setSelectedRam(uniqueRams[0]);
       }
@@ -57,7 +57,7 @@ const Tag = ({ productData, onClick }: Props) => {
             (item: any) => item.storageCapacity,
           ),
         ),
-      ];
+      ].sort((a, b) => parseInt(a) - parseInt(b)); // Sort ROM options numerically
       if (uniqueRoms.length > 0) {
         setSelectedRom(uniqueRoms[0]);
       }
@@ -144,27 +144,29 @@ const Tag = ({ productData, onClick }: Props) => {
             ...new Set(
               productData.lstProductTypeAndPrice.map((item: any) => item.ram),
             ),
-          ].map((ram: any, index) => {
-            const active = ram === selectedRam;
-            const className = clsx("border  px-10 py-4 text-xl rounded");
+          ]
+            .sort((a, b) => parseInt(a) - parseInt(b)) // Sort RAM options numerically
+            .map((ram: any, index) => {
+              const active = ram === selectedRam;
+              const className = clsx("border  px-10 py-4 text-xl rounded");
 
-            return (
-              <Button
-                style={{
-                  color: active ? `${PRIMARY_MAIN}` : "",
-                  border: active ? `1px solid ${PRIMARY_MAIN}` : "",
-                }}
-                className={className}
-                key={index}
-                onClick={() => {
-                  setSelectedRam(ram);
-                  setSelectedColor(null);
-                }}
-              >
-                {ram}
-              </Button>
-            );
-          })}
+              return (
+                <Button
+                  style={{
+                    color: active ? `${PRIMARY_MAIN}` : "",
+                    border: active ? `1px solid ${PRIMARY_MAIN}` : "",
+                  }}
+                  className={className}
+                  key={index}
+                  onClick={() => {
+                    setSelectedRam(ram);
+                    setSelectedColor(null);
+                  }}
+                >
+                  {ram}
+                </Button>
+              );
+            })}
         </div>
       )}
 
@@ -176,27 +178,29 @@ const Tag = ({ productData, onClick }: Props) => {
                 (item: any) => item.storageCapacity,
               ),
             ),
-          ].map((rom: any, index) => {
-            const active = rom === selectedRom;
-            const className = clsx("border  px-10 py-4 text-xl rounded");
+          ]
+            .sort((a, b) => parseInt(a) - parseInt(b)) // Sort ROM options numerically
+            .map((rom: any, index) => {
+              const active = rom === selectedRom;
+              const className = clsx("border  px-10 py-4 text-xl rounded");
 
-            return (
-              <Button
-                style={{
-                  color: active ? `${PRIMARY_MAIN}` : "",
-                  border: active ? `1px solid ${PRIMARY_MAIN}` : "",
-                }}
-                className={className}
-                key={index}
-                onClick={() => {
-                  setSelectedRom(rom);
-                  setSelectedColor(null);
-                }}
-              >
-                {rom}
-              </Button>
-            );
-          })}
+              return (
+                <Button
+                  style={{
+                    color: active ? `${PRIMARY_MAIN}` : "",
+                    border: active ? `1px solid ${PRIMARY_MAIN}` : "",
+                  }}
+                  className={className}
+                  key={index}
+                  onClick={() => {
+                    setSelectedRom(rom);
+                    setSelectedColor(null);
+                  }}
+                >
+                  {rom}
+                </Button>
+              );
+            })}
         </div>
       )}
 
