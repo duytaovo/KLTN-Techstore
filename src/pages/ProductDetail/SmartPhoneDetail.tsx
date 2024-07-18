@@ -272,11 +272,15 @@ export default function SmartPhoneDetail() {
       ]),
     );
     unwrapResult(_res);
+    console.log(_res?.payload?.data?.data?.productIdNotGoods);
     if (_res?.payload?.data?.data?.productIdNotGoods?.length > 0) {
-      toast.error("Sản phẩm này đã hết hàng trong kho", {
-        // position: "top-center",
-        autoClose: 4000,
-      });
+      toast.error(
+        `Sản phẩm này đã hết hàng trong kho,Chỉ còn lại ${_res?.payload?.data?.data?.productIdNotGoods[0]?.stockQuantity}, vui lòng tải lại trạng để cập nhật số lượng!`,
+        {
+          // position: "top-center",
+          autoClose: 5000,
+        },
+      );
       return true;
     }
     return false;
