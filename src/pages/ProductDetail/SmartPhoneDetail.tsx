@@ -518,7 +518,7 @@ export default function SmartPhoneDetail() {
                       max={selectedQuantityId}
                     />
                     <div className="ml-6 text-xl text-gray-500">
-                      {productDetail?.lstProductTypeAndPrice[0]?.quantity} sản
+                      {selectedQuantityId} sản
                       phẩm có sẵn
                     </div>
                   </div>

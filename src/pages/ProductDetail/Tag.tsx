@@ -86,7 +86,7 @@ const Tag = ({ productData, onClick }: Props) => {
         item.color === selectedColor &&
         item.ram === selectedRam,
     );
-
+    console.log(selectedProduct)
     if (selectedProduct) {
       setPrice(selectedProduct.price);
       setSalePrice(selectedProduct.salePrice);
@@ -96,7 +96,7 @@ const Tag = ({ productData, onClick }: Props) => {
       setSelectedQuantity(null);
       setSelectedDepot(null);
     }
-
+    console.log(selectedQuantity)
     onClick &&
       onClick({
         price,
@@ -108,7 +108,7 @@ const Tag = ({ productData, onClick }: Props) => {
         selectedQuantity,
         selectedDepot,
       });
-  }, [selectedRom, selectedColor, productData, onClick, selectedRam]);
+  }, [selectedRom, selectedColor, productData, onClick, selectedRam,selectedQuantity]);
 
   return (
     <div className="mb-4">
